@@ -2,9 +2,23 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## v1.0.0 - 2025-12-26
+
+### What's Changed
+
+* Create Laravel package for entry resource library by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/2
+* Claude/entry vault package u i6b u by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/3
+
+### New Contributors
+
+* @yannelli made their first contribution in https://github.com/yannelli/entry-vault-laravel/pull/2
+
+**Full Changelog**: https://github.com/yannelli/entry-vault-laravel/commits/v1.0.0
+
 ## 1.0.0 - 2025-12-26
 
 ### Added
+
 - Initial release of Entry Vault package
 - Entry management with CRUD operations
 - Multi-tenancy support with polymorphic ownership
