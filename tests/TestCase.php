@@ -31,11 +31,19 @@ class TestCase extends Orchestra
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
+            'foreign_key_constraints' => true,
         ]);
 
         // Set up Entry Vault config
         config()->set('entry-vault.user_model', 'Yannelli\\EntryVault\\Tests\\Models\\User');
         config()->set('entry-vault.team_model', 'Yannelli\\EntryVault\\Tests\\Models\\Team');
+
+        // Set up versionable config
+        config()->set('versionable.version_model', \Overtrue\LaravelVersionable\Version::class);
+        config()->set('versionable.user_model', 'Yannelli\\EntryVault\\Tests\\Models\\User');
+        config()->set('versionable.user_foreign_key', 'user_id');
+        config()->set('versionable.keep_versions', 0);
+        config()->set('versionable.uuid', false);
     }
 
     protected function defineDatabaseMigrations(): void
@@ -61,6 +69,16 @@ class TestCase extends Orchestra
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+        });
+
+        // Run versionable migration
+        $this->app['db']->connection()->getSchemaBuilder()->create('versions', function ($table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->morphs('versionable');
+            $table->json('contents')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         // Run package migrations
