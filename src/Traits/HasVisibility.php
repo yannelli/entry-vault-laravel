@@ -41,9 +41,10 @@ trait HasVisibility
                 $q->orWhere(function (Builder $q2) use ($user) {
                     $q2->where('visibility', EntryVisibility::TEAM->value);
 
-                    if (method_exists($user, 'currentTeam') && $user->currentTeam) {
-                        $q2->where('team_type', $user->currentTeam->getMorphClass())
-                            ->where('team_id', $user->currentTeam->getKey());
+                    $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+                    if ($currentTeam) {
+                        $q2->where('team_type', $currentTeam->getMorphClass())
+                            ->where('team_id', $currentTeam->getKey());
                     } elseif (method_exists($user, 'teams')) {
                         $teamIds = $user->teams->pluck('id');
                         $teamType = $user->teams->first()?->getMorphClass();
@@ -102,9 +103,10 @@ trait HasVisibility
         // Check team visibility
         if ($this->isTeamVisible() && $this->hasTeam()) {
             // Use team resolver if available
+            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
             if (EntryVault::hasTeamResolver()) {
-                if (method_exists($user, 'currentTeam') && $user->currentTeam) {
-                    return EntryVault::checkTeamAuthorization($user->currentTeam, $this);
+                if ($currentTeam) {
+                    return EntryVault::checkTeamAuthorization($currentTeam, $this);
                 }
             }
 
@@ -117,8 +119,8 @@ trait HasVisibility
                 return $user->teams->contains('id', $this->team_id);
             }
 
-            if (method_exists($user, 'currentTeam') && $user->currentTeam) {
-                return $user->currentTeam->getKey() === $this->team_id;
+            if ($currentTeam) {
+                return $currentTeam->getKey() === $this->team_id;
             }
         }
 
@@ -144,8 +146,9 @@ trait HasVisibility
         }
 
         // Check team authorization
-        if (EntryVault::hasTeamResolver() && method_exists($user, 'currentTeam') && $user->currentTeam) {
-            if (EntryVault::checkTeamAuthorization($user->currentTeam, $this)) {
+        $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+        if (EntryVault::hasTeamResolver() && $currentTeam) {
+            if (EntryVault::checkTeamAuthorization($currentTeam, $this)) {
                 return true;
             }
         }
