@@ -86,8 +86,6 @@ test('starters scope returns featured system templates', function () {
 });
 
 test('can create entry from template', function () {
-    Event::fake();
-
     $category = EntryCategory::create(['name' => 'Test Category', 'is_system' => true]);
 
     $template = Entry::create([
@@ -103,6 +101,8 @@ test('can create entry from template', function () {
         'body' => '# Template Content',
         'order' => 0,
     ]);
+
+    Event::fake([EntryCreatedFromTemplate::class]);
 
     $entry = Entry::createFromTemplate($template, [
         'title' => 'New Entry from Template',
