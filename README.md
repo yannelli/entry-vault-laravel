@@ -308,6 +308,30 @@ EntryVault::checkCustomAuthorization('organization', $org, $entry);
 $entry->isAuthorizedFor($user);
 ```
 
+### Visibility
+
+```php
+// Create with visibility
+$entry = Entry::create([
+    'title' => 'Team Entry',
+    'visibility' => 'team',
+    'team_type' => $team->getMorphClass(),
+    'team_id' => $team->id,
+]);
+
+// Query by visibility
+Entry::public()->get();
+Entry::private()->get();
+Entry::teamVisible()->get();
+
+// Get entries visible to a user
+Entry::visibleTo($user)->get();
+EntryVault::accessibleBy($user)->get();
+
+// Check access
+$entry->isAccessibleBy($user); // true/false
+```
+
 ### Categories
 
 ```php
