@@ -20,9 +20,9 @@ test('entry starts in draft state', function () {
 });
 
 test('can transition from draft to published', function () {
-    Event::fake();
-
     $entry = Entry::create(['title' => 'To Publish']);
+
+    Event::fake();
 
     $transition = new PublishTransition($entry);
     $transition->handle();
@@ -35,10 +35,10 @@ test('can transition from draft to published', function () {
 });
 
 test('can transition from published to draft (unpublish)', function () {
-    Event::fake();
-
     $entry = Entry::create(['title' => 'To Unpublish']);
     (new PublishTransition($entry))->handle();
+
+    Event::fake();
 
     $transition = new UnpublishTransition($entry->fresh());
     $transition->handle();
@@ -51,9 +51,9 @@ test('can transition from published to draft (unpublish)', function () {
 });
 
 test('can transition from draft to archived', function () {
-    Event::fake();
-
     $entry = Entry::create(['title' => 'To Archive']);
+
+    Event::fake();
 
     $transition = new ArchiveTransition($entry);
     $transition->handle();
@@ -65,10 +65,10 @@ test('can transition from draft to archived', function () {
 });
 
 test('can transition from published to archived', function () {
-    Event::fake();
-
     $entry = Entry::create(['title' => 'Published to Archive']);
     (new PublishTransition($entry))->handle();
+
+    Event::fake();
 
     $transition = new ArchiveTransition($entry->fresh());
     $transition->handle();
