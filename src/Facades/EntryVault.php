@@ -2,6 +2,7 @@
 
 namespace Yannelli\EntryVault\Facades;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
@@ -9,6 +10,21 @@ use Yannelli\EntryVault\Models\Entry;
 use Yannelli\EntryVault\Models\EntryCategory;
 
 /**
+ * @method static \Yannelli\EntryVault\EntryVault authorize(Closure $callback)
+ * @method static \Yannelli\EntryVault\EntryVault resolveOwner(string $model, ?Closure $authorize = null)
+ * @method static \Yannelli\EntryVault\EntryVault resolveTeam(string $model, ?Closure $authorize = null)
+ * @method static \Yannelli\EntryVault\EntryVault resolveCustom(string $name, string $model, Closure $authorize)
+ * @method static bool checkAuthorization(Entry $entry)
+ * @method static bool checkOwnerAuthorization(Model $owner, Entry $entry)
+ * @method static bool checkTeamAuthorization(Model $team, Entry $entry)
+ * @method static bool checkCustomAuthorization(string $name, Model $model, Entry $entry)
+ * @method static string|null getOwnerModel()
+ * @method static string|null getTeamModel()
+ * @method static bool hasOwnerResolver()
+ * @method static bool hasTeamResolver()
+ * @method static bool hasCustomResolver(string $name)
+ * @method static array getCustomResolvers()
+ * @method static \Yannelli\EntryVault\EntryVault flushResolvers()
  * @method static Entry create(array $attributes)
  * @method static Entry|null findBySlug(string $slug, ?Model $owner = null)
  * @method static Entry|null findByUuid(string $uuid)
