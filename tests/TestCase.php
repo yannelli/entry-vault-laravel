@@ -1,10 +1,10 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Yannelli\EntryVault\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use VendorName\Skeleton\SkeletonServiceProvider;
+use Yannelli\EntryVault\EntryVaultServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,25 +13,59 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'VendorName\\Skeleton\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Yannelli\\EntryVault\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            SkeletonServiceProvider::class,
+            EntryVaultServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        // Set up Entry Vault config
+        config()->set('entry-vault.user_model', 'Yannelli\\EntryVault\\Tests\\Models\\User');
+        config()->set('entry-vault.team_model', 'Yannelli\\EntryVault\\Tests\\Models\\Team');
+    }
+
+    protected function defineDatabaseMigrations(): void
+    {
+        // Create users table for testing
+        $this->app['db']->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamps();
+        });
+
+        // Create teams table for testing
+        $this->app['db']->connection()->getSchemaBuilder()->create('teams', function ($table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        // Create team_user pivot table
+        $this->app['db']->connection()->getSchemaBuilder()->create('team_user', function ($table) {
+            $table->id();
+            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->timestamps();
+        });
+
+        // Run package migrations
+        (include __DIR__.'/../database/migrations/create_entry_categories_table.php.stub')->up();
+        (include __DIR__.'/../database/migrations/create_entries_table.php.stub')->up();
+        (include __DIR__.'/../database/migrations/create_entry_contents_table.php.stub')->up();
     }
 }
