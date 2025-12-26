@@ -1,5 +1,5 @@
 {
-    "name": "yannelli/entry-vault",
+    "name": "yannelli/entry-vault-laravel",
     "description": "A Laravel 12 package for building a backend-only entry/resource library system with multi-tenancy, versioning, and state management",
     "keywords": [
         "yannelli",
@@ -11,13 +11,12 @@
         "versioning",
         "multi-tenancy"
     ],
-    "homepage": "https://github.com/yannelli/entry-vault",
+    "homepage": "https://github.com/yannelli/entry-vault-laravel",
     "license": "MIT",
     "authors": [
         {
             "name": "Ryan Yannelli",
-            "email": "author@domain.com",
-            "role": "Developer"
+            "email": "ryanyannelli@gmail.com",
         }
     ],
     "require": {
