@@ -5,6 +5,7 @@ namespace Yannelli\EntryVault\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Yannelli\EntryVault\Enums\EntryVisibility;
+use Yannelli\EntryVault\Facades\EntryVault;
 
 trait HasVisibility
 {
@@ -76,18 +77,38 @@ trait HasVisibility
 
     public function isAccessibleBy(Model $user): bool
     {
+        // Check global authorization callback first
+        if (! EntryVault::checkAuthorization($this)) {
+            return false;
+        }
+
         // Public entries are accessible to everyone
         if ($this->isPublic()) {
             return true;
         }
 
-        // Check if user is the owner
-        if ($this->isOwnedBy($user)) {
-            return true;
+        // Check owner authorization using resolver
+        if (EntryVault::hasOwnerResolver()) {
+            if (EntryVault::checkOwnerAuthorization($user, $this)) {
+                return true;
+            }
+        } else {
+            // Fall back to default ownership check
+            if ($this->isOwnedBy($user)) {
+                return true;
+            }
         }
 
         // Check team visibility
         if ($this->isTeamVisible() && $this->hasTeam()) {
+            // Use team resolver if available
+            if (EntryVault::hasTeamResolver()) {
+                if (method_exists($user, 'currentTeam') && $user->currentTeam) {
+                    return EntryVault::checkTeamAuthorization($user->currentTeam, $this);
+                }
+            }
+
+            // Fall back to default team checks
             if (method_exists($user, 'belongsToTeam')) {
                 return $user->belongsToTeam($this->team);
             }
@@ -102,5 +123,41 @@ trait HasVisibility
         }
 
         return false;
+    }
+
+    /**
+     * Check if entry is accessible using all registered resolvers.
+     * This is a more comprehensive check that includes custom resolvers.
+     */
+    public function isAuthorizedFor(Model $user): bool
+    {
+        // Check global authorization
+        if (! EntryVault::checkAuthorization($this)) {
+            return false;
+        }
+
+        // Check owner authorization
+        if (EntryVault::hasOwnerResolver()) {
+            if (EntryVault::checkOwnerAuthorization($user, $this)) {
+                return true;
+            }
+        }
+
+        // Check team authorization
+        if (EntryVault::hasTeamResolver() && method_exists($user, 'currentTeam') && $user->currentTeam) {
+            if (EntryVault::checkTeamAuthorization($user->currentTeam, $this)) {
+                return true;
+            }
+        }
+
+        // Check custom resolvers
+        foreach (EntryVault::getCustomResolvers() as $name => $resolver) {
+            if (EntryVault::checkCustomAuthorization($name, $user, $this)) {
+                return true;
+            }
+        }
+
+        // Fall back to standard accessibility check
+        return $this->isAccessibleBy($user);
     }
 }

@@ -187,6 +187,151 @@ EntryVault::accessibleBy($user)->get();
 $entry->isAccessibleBy($user); // true/false
 ```
 
+## Authorization Resolvers
+
+Entry Vault provides a flexible authorization system that allows you to define custom authorization logic in your service provider. This gives you full control over how ownership and team access are determined.
+
+### Registering Resolvers
+
+Register resolvers in your `AppServiceProvider` boot method:
+
+```php
+use App\Models\Team;
+use App\Models\User;
+use Yannelli\EntryVault\Facades\EntryVault;
+use Yannelli\EntryVault\Models\Entry;
+
+public function boot(): void
+{
+    // Global authorization callback
+    EntryVault::authorize(function (Entry $entry) {
+        // Custom global auth logic
+        return $entry->owner_id === auth()->id() || auth()->user()->isAdmin();
+    });
+
+    // Owner resolver with custom authorization
+    EntryVault::resolveOwner(
+        model: User::class,
+        authorize: function (User $user, Entry $entry) {
+            return $user->id === $entry->owner_id;
+        }
+    );
+
+    // Team resolver with custom authorization
+    EntryVault::resolveTeam(
+        model: Team::class,
+        authorize: function (Team $team, Entry $entry) {
+            return auth()->user()->currentTeam?->id === $entry->team_id
+                || $entry->owner_id === auth()->user()->current_team_id;
+        }
+    );
+}
+```
+
+### Global Authorization
+
+The `authorize()` method registers a global callback that is checked before any other authorization:
+
+```php
+EntryVault::authorize(function (Entry $entry) {
+    // Return false to deny access to any entry
+    // Return true to allow (subject to other checks)
+    return $entry->visibility !== 'archived';
+});
+```
+
+### Owner Resolver
+
+Register your user model and optional authorization logic:
+
+```php
+// Simple registration (uses default ownership check)
+EntryVault::resolveOwner(model: User::class);
+
+// With custom authorization logic
+EntryVault::resolveOwner(
+    model: User::class,
+    authorize: function (User $user, Entry $entry) {
+        // Allow if owner OR if user is admin
+        return $user->id === $entry->owner_id || $user->hasRole('admin');
+    }
+);
+```
+
+### Team Resolver
+
+Register your team model with optional authorization logic:
+
+```php
+EntryVault::resolveTeam(
+    model: Team::class,
+    authorize: function (Team $team, Entry $entry) {
+        // Custom team access logic
+        return $team->id === $entry->team_id;
+    }
+);
+```
+
+### Custom Resolvers
+
+For more complex authorization scenarios, register custom resolvers:
+
+```php
+EntryVault::resolveCustom(
+    name: 'organization',
+    model: Organization::class,
+    authorize: function (Organization $org, Entry $entry) {
+        return $org->entries()->where('id', $entry->id)->exists();
+    }
+);
+
+// Check custom resolver
+$entry->isAuthorizedFor($user); // Checks all resolvers including custom
+```
+
+### Checking Authorization
+
+```php
+// Check global authorization
+EntryVault::checkAuthorization($entry);
+
+// Check owner authorization
+EntryVault::checkOwnerAuthorization($user, $entry);
+
+// Check team authorization
+EntryVault::checkTeamAuthorization($team, $entry);
+
+// Check custom resolver
+EntryVault::checkCustomAuthorization('organization', $org, $entry);
+
+// Check all resolvers (on entry model)
+$entry->isAuthorizedFor($user);
+```
+
+### Visibility
+
+```php
+// Create with visibility
+$entry = Entry::create([
+    'title' => 'Team Entry',
+    'visibility' => 'team',
+    'team_type' => $team->getMorphClass(),
+    'team_id' => $team->id,
+]);
+
+// Query by visibility
+Entry::public()->get();
+Entry::private()->get();
+Entry::teamVisible()->get();
+
+// Get entries visible to a user
+Entry::visibleTo($user)->get();
+EntryVault::accessibleBy($user)->get();
+
+// Check access
+$entry->isAccessibleBy($user); // true/false
+```
+
 ### Categories
 
 ```php
