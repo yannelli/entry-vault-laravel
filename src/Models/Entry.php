@@ -67,7 +67,7 @@ class Entry extends Model
         'category_id',
     ];
 
-    protected string $versionStrategy = VersionStrategy::SNAPSHOT;
+    protected VersionStrategy $versionStrategy = VersionStrategy::SNAPSHOT;
 
     protected $casts = [
         'state' => EntryState::class,
@@ -265,11 +265,12 @@ class Entry extends Model
             });
 
             // Team entries
-            if (method_exists($user, 'currentTeam') && $user->currentTeam) {
-                $q->orWhere(function (Builder $q2) use ($user) {
+            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            if ($currentTeam) {
+                $q->orWhere(function (Builder $q2) use ($currentTeam) {
                     $q2->where('visibility', EntryVisibility::TEAM->value)
-                        ->where('team_type', $user->currentTeam->getMorphClass())
-                        ->where('team_id', $user->currentTeam->getKey());
+                        ->where('team_type', $currentTeam->getMorphClass())
+                        ->where('team_id', $currentTeam->getKey());
                 });
             } elseif (method_exists($user, 'teams')) {
                 $q->orWhere(function (Builder $q2) use ($user) {
