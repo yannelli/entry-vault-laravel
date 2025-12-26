@@ -110,10 +110,11 @@ class EntryCategory extends Model
             });
 
             // User's team categories (if applicable)
-            if (method_exists($user, 'currentTeam') && $user->currentTeam) {
-                $q->orWhere(function (Builder $q2) use ($user) {
-                    $q2->where('owner_type', $user->currentTeam->getMorphClass())
-                        ->where('owner_id', $user->currentTeam->getKey());
+            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            if ($currentTeam) {
+                $q->orWhere(function (Builder $q2) use ($currentTeam) {
+                    $q2->where('owner_type', $currentTeam->getMorphClass())
+                        ->where('owner_id', $currentTeam->getKey());
                 });
             } elseif (method_exists($user, 'teams')) {
                 $q->orWhere(function (Builder $q2) use ($user) {
