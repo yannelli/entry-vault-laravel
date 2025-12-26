@@ -2,8 +2,8 @@
 
 A Laravel 12 package for building a backend-only entry/resource library system with multi-tenancy, versioning, and state management.
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/yannelli/entry-vault.svg?style=flat-square)](https://packagist.org/packages/yannelli/entry-vault)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/yannelli/entry-vault/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/entry-vault/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/yannelli/entry-vault-laravel.svg?style=flat-square)](https://packagist.org/packages/yannelli/entry-vault-laravel)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/yannelli/entry-vault-laravel/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/entry-vault-laravel/actions?query=workflow%3Arun-tests+branch%3Amain)
 
 ## Features
 
@@ -23,7 +23,7 @@ A Laravel 12 package for building a backend-only entry/resource library system w
 Install the package via Composer:
 
 ```bash
-composer require yannelli/entry-vault
+composer require yannelli/entry-vault-laravel
 ```
 
 Run the installation command:
