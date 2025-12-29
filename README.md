@@ -74,6 +74,7 @@ return [
         'entry' => \Yannelli\EntryVault\Models\Entry::class,
         'content' => \Yannelli\EntryVault\Models\EntryContent::class,
         'category' => \Yannelli\EntryVault\Models\EntryCategory::class,
+        'version' => \Yannelli\EntryVault\Models\EntryVersion::class,
     ],
 
     // User and team models
