@@ -15,6 +15,7 @@ class EntryVaultServiceProvider extends PackageServiceProvider
             ->name('entry-vault')
             ->hasConfigFile()
             ->hasMigrations([
+                'create_entry_versions_table',
                 'create_entry_categories_table',
                 'create_entries_table',
                 'create_entry_contents_table',
@@ -34,6 +35,7 @@ class EntryVaultServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        // Register model bindings if needed
+        // Set the versionable package to use our custom version model
+        config(['versionable.version_model' => config('entry-vault.models.version')]);
     }
 }
