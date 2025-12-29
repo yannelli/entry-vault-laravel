@@ -71,17 +71,8 @@ class TestCase extends Orchestra
             $table->timestamps();
         });
 
-        // Run versionable migration
-        $this->app['db']->connection()->getSchemaBuilder()->create('versions', function ($table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->morphs('versionable');
-            $table->json('contents')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
         // Run package migrations
+        (include __DIR__.'/../database/migrations/create_versions_table.php.stub')->up();
         (include __DIR__.'/../database/migrations/create_entry_categories_table.php.stub')->up();
         (include __DIR__.'/../database/migrations/create_entries_table.php.stub')->up();
         (include __DIR__.'/../database/migrations/create_entry_contents_table.php.stub')->up();
