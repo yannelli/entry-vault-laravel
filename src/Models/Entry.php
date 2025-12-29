@@ -26,6 +26,39 @@ use Yannelli\EntryVault\Traits\HasOwner;
 use Yannelli\EntryVault\Traits\HasTeam;
 use Yannelli\EntryVault\Traits\HasVisibility;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $title
+ * @property string $slug
+ * @property string|null $description
+ * @property array<string>|null $keywords
+ * @property EntryState $state
+ * @property string $visibility
+ * @property int|null $category_id
+ * @property bool $is_template
+ * @property bool $is_featured
+ * @property int|null $template_id
+ * @property string|null $owner_type
+ * @property int|null $owner_id
+ * @property string|null $team_type
+ * @property int|null $team_id
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property int $display_order
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, EntryContent> $contents
+ * @property-read EntryCategory|null $category
+ * @property-read Model|null $owner
+ * @property-read Model|null $team
+ * @property-read Model|null $creator
+ * @property-read Model|null $updater
+ * @property-read Entry|null $template
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Entry> $derivedEntries
+ */
 class Entry extends Model
 {
     use HasFactory;

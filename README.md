@@ -15,8 +15,9 @@ A Laravel 12 package for building a backend-only entry/resource library system w
 - **Version History** - Built-in versioning with revert capabilities
 - **Category System** - System, team, or user-owned categories
 - **Template System** - Create entries from templates with featured/starter templates
+- **Filament 3 Integration** - Optional admin panel for managing entries, categories, and content
 
-**No UI components are included.** This is a pure backend/API package.
+**No UI components are included by default.** This is a pure backend/API package with optional Filament admin panel integration.
 
 ## Installation
 
@@ -90,6 +91,137 @@ return [
         'keep_versions' => 50,
     ],
 ];
+```
+
+## Filament Admin Panel (Optional)
+
+Entry Vault includes optional Filament 3 admin panel integration for managing entries, categories, and content.
+
+### Installing Filament
+
+First, ensure you have Filament 3 installed in your Laravel application:
+
+```bash
+composer require filament/filament:"^3.0"
+php artisan filament:install --panels
+```
+
+### Registering the Plugin
+
+Register the `EntryVaultPlugin` in your Filament panel provider:
+
+```php
+use Yannelli\EntryVault\Filament\EntryVaultPlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ... other configuration
+        ->plugins([
+            EntryVaultPlugin::make(),
+        ]);
+}
+```
+
+### Plugin Configuration
+
+The plugin can be configured with various options:
+
+```php
+use Yannelli\EntryVault\Filament\EntryVaultPlugin;
+
+EntryVaultPlugin::make()
+    // Customize navigation group
+    ->navigationGroup('Content Management')
+
+    // Set navigation sort order
+    ->navigationSort(10)
+
+    // Disable specific resources
+    ->entryResource(false)           // Disable Entry resource
+    ->entryCategoryResource(false)   // Disable Category resource
+
+    // Use custom resource classes
+    ->usingEntryResource(CustomEntryResource::class)
+    ->usingEntryCategoryResource(CustomCategoryResource::class)
+```
+
+### Configuration File Options
+
+You can also configure Filament settings in `config/entry-vault.php`:
+
+```php
+'filament' => [
+    // Navigation group for Entry Vault resources
+    'navigation_group' => 'Content',
+
+    // Navigation sort order (null for default)
+    'navigation_sort' => null,
+
+    // Customize resource labels
+    'entry_label' => 'Entry',
+    'entry_plural_label' => 'Entries',
+    'category_label' => 'Category',
+    'category_plural_label' => 'Categories',
+],
+```
+
+### Features
+
+The Filament integration provides:
+
+**Entry Resource:**
+- Full CRUD for entries with inline content editing
+- State management actions (Publish, Unpublish, Archive, Restore)
+- Category assignment and filtering
+- Visibility controls
+- Template management (mark as template, featured)
+- Soft delete with restore/force delete
+- Contents relation manager for managing content blocks
+
+**Category Resource:**
+- Full CRUD for categories
+- System/default category flags
+- Color and icon customization
+- Display order (drag-and-drop reordering)
+- Entry count display
+- Soft delete support
+
+**Content Blocks Relation Manager:**
+- Add/edit/remove content blocks for entries
+- Support for all content types (Markdown, HTML, JSON, Text)
+- Appropriate editor for each content type
+- Drag-and-drop reordering
+
+### Extending Resources
+
+You can extend the default Filament resources:
+
+```php
+namespace App\Filament\Resources;
+
+use Yannelli\EntryVault\Filament\Resources\EntryResource as BaseEntryResource;
+
+class EntryResource extends BaseEntryResource
+{
+    // Add custom columns, filters, or actions
+    public static function table(Table $table): Table
+    {
+        return parent::table($table)
+            ->columns([
+                // Add custom columns
+                ...parent::table($table)->getColumns(),
+                Tables\Columns\TextColumn::make('custom_field'),
+            ]);
+    }
+}
+```
+
+Then register your custom resource:
+
+```php
+EntryVaultPlugin::make()
+    ->usingEntryResource(App\Filament\Resources\EntryResource::class)
 ```
 
 ## Basic Usage
