@@ -14,6 +14,7 @@ class EntryVaultServiceProvider extends PackageServiceProvider
         $package
             ->name('entry-vault')
             ->hasConfigFile()
+            ->hasViews()
             ->hasMigrations([
                 'create_entry_versions_table',
                 'create_entry_categories_table',

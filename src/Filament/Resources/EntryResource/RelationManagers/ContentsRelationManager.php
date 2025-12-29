@@ -111,6 +111,16 @@ class ContentsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
+                Tables\Actions\Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading('Content Preview')
+                    ->modalContent(fn ($record): \Illuminate\Contracts\View\View => view('entry-vault::filament.entry-preview', [
+                        'contents' => collect([$record]),
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
