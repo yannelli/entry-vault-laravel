@@ -2,6 +2,14 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## v1.1.0 - 2025-12-29
+
+### What's Changed
+
+* Add Laravel Filament 3 admin provider by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/4
+
+**Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.0.3...v1.1.0
+
 ## v1.0.3 - 2025-12-26
 
 **Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.0.2...v1.0.3
