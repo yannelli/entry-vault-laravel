@@ -132,4 +132,50 @@ return [
     |
     */
     'seed_default_categories' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filament Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration options for the optional Filament admin panel integration.
+    | These settings are only used if you register the EntryVaultPlugin.
+    |
+    */
+    'filament' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Navigation Group
+        |--------------------------------------------------------------------------
+        |
+        | The navigation group for Entry Vault resources in the Filament sidebar.
+        | Set to null to display resources at the top level.
+        |
+        */
+        'navigation_group' => 'Content',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Navigation Sort
+        |--------------------------------------------------------------------------
+        |
+        | The sort order for the Entry Vault navigation group.
+        | Lower numbers appear first in the sidebar.
+        |
+        */
+        'navigation_sort' => null,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resource Labels
+        |--------------------------------------------------------------------------
+        |
+        | Customize the labels used for Entry Vault resources in Filament.
+        |
+        */
+        'entry_label' => 'Entry',
+        'entry_plural_label' => 'Entries',
+        'category_label' => 'Category',
+        'category_plural_label' => 'Categories',
+    ],
 ];
