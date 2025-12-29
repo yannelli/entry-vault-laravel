@@ -2,6 +2,14 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## v1.1.1 - 2025-12-29
+
+### What's Changed
+
+* Fix versions table and migration setup by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/5
+
+**Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.1.0...v1.1.1
+
 ## v1.1.0 - 2025-12-29
 
 ### What's Changed
