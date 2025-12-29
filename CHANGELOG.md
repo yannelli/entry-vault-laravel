@@ -2,6 +2,14 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## v1.2.0 - 2025-12-29
+
+### What's Changed
+
+* Add entry content preview feature to Filament plugin by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/6
+
+**Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.1.1...v1.2.0
+
 ## v1.1.1 - 2025-12-29
 
 ### What's Changed
