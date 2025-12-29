@@ -262,6 +262,17 @@ class EntryResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
+                    Tables\Actions\Action::make('preview')
+                        ->label('Preview')
+                        ->icon('heroicon-o-eye')
+                        ->color('info')
+                        ->modalHeading(fn (Entry $record): string => "Preview: {$record->title}")
+                        ->modalContent(fn (Entry $record): \Illuminate\Contracts\View\View => view('entry-vault::filament.entry-preview', [
+                            'contents' => $record->contents,
+                        ]))
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Close')
+                        ->slideOver(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('publish')
                         ->label('Publish')
@@ -394,6 +405,14 @@ class EntryResource extends Resource
                             ->visible(fn () => config('entry-vault.soft_deletes', true)),
                     ])
                     ->columns(4),
+
+                Infolists\Components\Section::make('Content Preview')
+                    ->schema([
+                        Infolists\Components\ViewEntry::make('contents')
+                            ->view('entry-vault::filament.entry-preview')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
