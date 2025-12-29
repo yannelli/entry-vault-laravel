@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('versions', function (Blueprint $table) {
+        Schema::create('entry_versions', function (Blueprint $table) {
             $uuid = config('versionable.uuid', false);
             $userForeignKey = config('versionable.user_foreign_key', 'user_id');
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('versions');
+        Schema::dropIfExists('entry_versions');
     }
 };
