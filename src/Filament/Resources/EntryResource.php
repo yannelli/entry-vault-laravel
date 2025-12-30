@@ -3,10 +3,9 @@
 namespace Yannelli\EntryVault\Filament\Resources;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +21,7 @@ use Yannelli\EntryVault\States\Published;
 
 class EntryResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 1;
 
@@ -51,7 +50,7 @@ class EntryResource extends Resource
         return EntryVaultPlugin::get()->getNavigationSort() ?? static::$navigationSort;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -259,7 +258,7 @@ class EntryResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->visible(fn () => config('entry-vault.soft_deletes', true)),
             ])
-            ->actions([
+            ->recordActions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\Action::make('preview')
@@ -320,7 +319,7 @@ class EntryResource extends Resource
                     Tables\Actions\ForceDeleteAction::make(),
                 ]),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
@@ -330,7 +329,7 @@ class EntryResource extends Resource
             ->defaultSort('display_order', 'asc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist
             ->schema([
