@@ -96,11 +96,11 @@ return [
 
 ## Filament Admin Panel (Optional)
 
-Entry Vault includes optional Filament 3 admin panel integration for managing entries, categories, and content.
+Entry Vault includes optional Filament 4 admin panel integration for managing entries, categories, and content.
 
 ### Installing Filament
 
-First, ensure you have Filament 3 installed in your Laravel application:
+First, ensure you have Filament 4 installed in your Laravel application:
 
 ```bash
 composer require filament/filament:"^3.0"
@@ -636,7 +636,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Credits
 
-- [Ryan Yannelli](https://github.com/yannelli)
+- [Ryan Yannelli](https://ryanyannelli.com)
 - [All Contributors](../../contributors)
 
 ## License
