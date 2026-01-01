@@ -3,10 +3,9 @@
 namespace Yannelli\EntryVault\Filament\Resources;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +16,7 @@ use Yannelli\EntryVault\Models\EntryCategory;
 
 class EntryCategoryResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-folder';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
 
     protected static ?int $navigationSort = 2;
 
@@ -48,9 +47,9 @@ class EntryCategoryResource extends Resource
         return $baseSort !== null ? $baseSort + 1 : static::$navigationSort;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Category Details')
                     ->schema([
@@ -195,9 +194,9 @@ class EntryCategoryResource extends Resource
             ->defaultSort('display_order', 'asc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Infolists\Components\Section::make('Category Details')
                     ->schema([
