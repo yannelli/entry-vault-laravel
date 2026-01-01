@@ -15,7 +15,7 @@ A Laravel 12 package for building a backend-only entry/resource library system w
 - **Version History** - Built-in versioning with revert capabilities
 - **Category System** - System, team, or user-owned categories
 - **Template System** - Create entries from templates with featured/starter templates
-- **Filament 3 Integration** - Optional admin panel for managing entries, categories, and content
+- **Filament 4 Integration** - Optional admin panel for managing entries, categories, and content
 
 **No UI components are included by default.** This is a pure backend/API package with optional Filament admin panel integration.
 
@@ -103,7 +103,7 @@ Entry Vault includes optional Filament 4 admin panel integration for managing en
 First, ensure you have Filament 4 installed in your Laravel application:
 
 ```bash
-composer require filament/filament:"^3.0"
+composer require filament/filament:"^4.0"
 php artisan filament:install --panels
 ```
 
@@ -153,6 +153,9 @@ You can also configure Filament settings in `config/entry-vault.php`:
 
 ```php
 'filament' => [
+    // Enable the Filament integration (disabled by default)
+    'enabled' => false,
+
     // Navigation group for Entry Vault resources
     'navigation_group' => 'Content',
 
@@ -166,6 +169,29 @@ You can also configure Filament settings in `config/entry-vault.php`:
     'category_plural_label' => 'Categories',
 ],
 ```
+
+### Enabling Filament Integration
+
+The Filament integration is disabled by default. To enable it, set `enabled` to `true` in your config:
+
+```php
+// config/entry-vault.php
+'filament' => [
+    'enabled' => true,
+    // ...
+],
+```
+
+Or use an environment variable:
+
+```php
+'filament' => [
+    'enabled' => env('ENTRY_VAULT_FILAMENT_ENABLED', false),
+    // ...
+],
+```
+
+When disabled, `EntryVaultPlugin::make()` will not register any resources even if added to your panel.
 
 ### Features
 
