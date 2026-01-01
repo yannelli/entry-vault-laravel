@@ -146,6 +146,18 @@ return [
     'filament' => [
         /*
         |--------------------------------------------------------------------------
+        | Enable Filament Integration
+        |--------------------------------------------------------------------------
+        |
+        | Set to true to enable the Filament admin panel integration.
+        | When disabled, the EntryVaultPlugin will not register any resources.
+        | You must explicitly enable this if you want to use the Filament admin.
+        |
+        */
+        'enabled' => false,
+
+        /*
+        |--------------------------------------------------------------------------
         | Navigation Group
         |--------------------------------------------------------------------------
         |
