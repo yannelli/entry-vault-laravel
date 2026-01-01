@@ -39,8 +39,21 @@ class EntryVaultPlugin implements Plugin
         return 'entry-vault';
     }
 
+    /**
+     * Check if the Filament integration is enabled via config.
+     */
+    public static function isEnabled(): bool
+    {
+        return (bool) config('entry-vault.filament.enabled', true);
+    }
+
     public function register(Panel $panel): void
     {
+        // Don't register any resources if Filament integration is disabled
+        if (! static::isEnabled()) {
+            return;
+        }
+
         $resources = [];
 
         if ($this->hasEntryResource) {
