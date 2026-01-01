@@ -45,6 +45,8 @@ test('plugin can disable entry category resource', function () {
 });
 
 test('plugin can set custom entry resource class', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = (new EntryVaultPlugin)
         ->usingEntryResource(CustomEntryResource::class);
 
@@ -60,6 +62,8 @@ test('plugin can set custom entry resource class', function () {
 });
 
 test('plugin can set custom entry category resource class', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = (new EntryVaultPlugin)
         ->usingEntryCategoryResource(CustomEntryCategoryResource::class);
 
@@ -105,6 +109,8 @@ test('plugin uses config navigation sort when not set explicitly', function () {
 });
 
 test('plugin registers both resources when enabled', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = new EntryVaultPlugin;
 
     /** @var MockInterface&Panel $panel */
@@ -121,6 +127,8 @@ test('plugin registers both resources when enabled', function () {
 });
 
 test('plugin registers no resources when both disabled', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = (new EntryVaultPlugin)
         ->entryResource(false)
         ->entryCategoryResource(false);
@@ -135,6 +143,8 @@ test('plugin registers no resources when both disabled', function () {
 });
 
 test('plugin registers only entry resource when category is disabled', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = (new EntryVaultPlugin)
         ->entryCategoryResource(false);
 
@@ -148,6 +158,8 @@ test('plugin registers only entry resource when category is disabled', function 
 });
 
 test('plugin registers only category resource when entry is disabled', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
     $plugin = (new EntryVaultPlugin)
         ->entryResource(false);
 
@@ -175,6 +187,44 @@ test('plugin fluent api returns same instance', function () {
         ->toBe($plugin)
         ->and($plugin->usingEntryCategoryResource(EntryCategoryResource::class))
         ->toBe($plugin);
+});
+
+test('plugin isEnabled returns false by default', function () {
+    expect(EntryVaultPlugin::isEnabled())->toBeFalse();
+});
+
+test('plugin isEnabled respects config setting', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
+    expect(EntryVaultPlugin::isEnabled())->toBeTrue();
+});
+
+test('plugin registers no resources when disabled via config', function () {
+    config()->set('entry-vault.filament.enabled', false);
+
+    $plugin = new EntryVaultPlugin;
+
+    /** @var MockInterface&Panel $panel */
+    $panel = Mockery::mock(Panel::class);
+    $panel->shouldNotReceive('resources');
+
+    $plugin->register($panel);
+});
+
+test('plugin registers resources when enabled via config', function () {
+    config()->set('entry-vault.filament.enabled', true);
+
+    $plugin = new EntryVaultPlugin;
+
+    /** @var MockInterface&Panel $panel */
+    $panel = Mockery::mock(Panel::class);
+    $panel->shouldReceive('resources')
+        ->once()
+        ->with(Mockery::on(function ($resources) {
+            return count($resources) === 2;
+        }));
+
+    $plugin->register($panel);
 });
 
 // Stub classes for testing custom resource configuration
