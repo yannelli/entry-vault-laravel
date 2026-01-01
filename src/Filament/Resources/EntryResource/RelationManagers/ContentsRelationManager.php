@@ -3,8 +3,8 @@
 namespace Yannelli\EntryVault\Filament\Resources\EntryResource\RelationManagers;
 
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Yannelli\EntryVault\Enums\ContentType;
@@ -17,7 +17,7 @@ class ContentsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'type';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -110,7 +110,7 @@ class ContentsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
             ])
-            ->recordActions([
+            ->actions([
                 Tables\Actions\Action::make('preview')
                     ->label('Preview')
                     ->icon('heroicon-o-eye')
@@ -124,7 +124,7 @@ class ContentsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
