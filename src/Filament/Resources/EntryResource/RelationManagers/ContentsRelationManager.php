@@ -3,8 +3,8 @@
 namespace Yannelli\EntryVault\Filament\Resources\EntryResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Yannelli\EntryVault\Enums\ContentType;
@@ -17,9 +17,9 @@ class ContentsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'type';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('type')
                     ->options(collect(ContentType::cases())->mapWithKeys(fn ($case) => [
