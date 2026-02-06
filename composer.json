@@ -42,7 +42,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "filament/filament": "^4.0"
+        "filament/filament": "^5.2"
     },
     "autoload": {
         "psr-4": {
