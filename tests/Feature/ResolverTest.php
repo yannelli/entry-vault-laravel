@@ -174,7 +174,7 @@ test('resolver methods are chainable', function () {
         ->resolveOwner(User::class, fn () => true)
         ->resolveTeam(Team::class, fn () => true);
 
-    expect($result)->toBeInstanceOf(\Yannelli\EntryVault\EntryVault::class);
+    expect($result)->toBeInstanceOf(Yannelli\EntryVault\EntryVault::class);
 });
 
 test('owner resolver without authorize callback uses default check', function () {

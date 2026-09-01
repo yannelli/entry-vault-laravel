@@ -36,9 +36,7 @@ class ViewEntry extends ViewRecord
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Draft)
                 ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Published::class);
-                    $record->published_at = now();
-                    $record->save();
+                    $record->publish();
                 }),
             Actions\Action::make('unpublish')
                 ->label('Unpublish')
@@ -47,8 +45,7 @@ class ViewEntry extends ViewRecord
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Published)
                 ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Draft::class);
-                    $record->save();
+                    $record->unpublish();
                 }),
             Actions\Action::make('archive')
                 ->label('Archive')
@@ -57,8 +54,16 @@ class ViewEntry extends ViewRecord
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => ! $record->state instanceof Archived)
                 ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Archived::class);
-                    $record->save();
+                    $record->archive();
+                }),
+            Actions\Action::make('restore_state')
+                ->label('Restore to Draft')
+                ->icon('heroicon-o-arrow-path')
+                ->color('gray')
+                ->requiresConfirmation()
+                ->visible(fn (Entry $record): bool => $record->state instanceof Archived)
+                ->action(function (Entry $record): void {
+                    $record->restoreToDraft();
                 }),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),

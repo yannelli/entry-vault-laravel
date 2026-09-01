@@ -5,6 +5,7 @@ namespace Yannelli\EntryVault\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Yannelli\EntryVault\EntryVaultServiceProvider;
+use Yannelli\EntryVault\Models\EntryVersion;
 
 class TestCase extends Orchestra
 {
@@ -39,7 +40,7 @@ class TestCase extends Orchestra
         config()->set('entry-vault.team_model', 'Yannelli\\EntryVault\\Tests\\Models\\Team');
 
         // Set up versionable config
-        config()->set('versionable.version_model', \Yannelli\EntryVault\Models\EntryVersion::class);
+        config()->set('versionable.version_model', EntryVersion::class);
         config()->set('versionable.user_model', 'Yannelli\\EntryVault\\Tests\\Models\\User');
         config()->set('versionable.user_foreign_key', 'user_id');
         config()->set('versionable.keep_versions', 0);
@@ -53,6 +54,7 @@ class TestCase extends Orchestra
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->unsignedBigInteger('current_team_id')->nullable();
             $table->timestamps();
         });
 

@@ -2,6 +2,31 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## Unreleased
+
+### Added
+
+- Laravel 13 support alongside Laravel 12
+- PHP 8.5 support (PHP 8.2–8.5)
+- CI test matrix coverage for PHP 8.2/8.3/8.4/8.5 and Laravel 12/13
+- Entry helpers `publish()`, `unpublish()`, `archive()`, and `restoreToDraft()` that run the registered state transitions
+
+### Changed
+
+- Raised optional Filament admin integration to Filament 5 (from 4), including Schema `Section` / `Get` / `Set` and table `recordActions()` / `toolbarActions()`
+- GitHub Actions: `ramsey/composer-install` v4, `dependabot/fetch-metadata` v3.1.0, `actions/checkout` v6
+- Composer constraints updated for Laravel 12|13 (`illuminate/*`, `orchestra/testbench` 10|11, `overtrue/laravel-versionable` 5.5|6, Pest 3|4). Pest 5 is not included because it requires PHP 8.4 and `pestphp/pest-plugin-laravel` 5.0.1 supports Laravel 13 only.
+
+### Fixed
+
+- PHPStan workflow now actually runs `phpstan analyse` after installing dependencies, and the package is clean at level 5
+- Filament plugin `isEnabled()` fallback now matches the config default (`false`)
+- Filament state actions use statement closures so `publish()` / `archive()` return values do not violate `void` action types
+- Entry view page includes the Restore to Draft action for archived entries
+- Team visibility/authorization now supports Jetstream-style `currentTeam()` relationships (which return a Relation, not a model)
+- State machine now uses the package transition classes, so `transitionTo()` sets `published_at` and dispatches lifecycle events
+- Bug report template placeholders and GitHub issue contact links no longer use Spatie skeleton stubs
+
 ## v1.4.1 - 2025-12-30
 
 **Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.4.0...v1.4.1

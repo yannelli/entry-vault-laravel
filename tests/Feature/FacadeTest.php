@@ -3,6 +3,7 @@
 use Yannelli\EntryVault\Facades\EntryVault;
 use Yannelli\EntryVault\Models\Entry;
 use Yannelli\EntryVault\Models\EntryCategory;
+use Yannelli\EntryVault\Models\EntryContent;
 use Yannelli\EntryVault\Tests\Models\User;
 
 beforeEach(function () {
@@ -143,7 +144,7 @@ test('facade can create from template', function () {
 });
 
 test('facade returns correct model classes', function () {
-    expect(EntryVault::getEntryModel())->toBe(\Yannelli\EntryVault\Models\Entry::class)
-        ->and(EntryVault::getCategoryModel())->toBe(\Yannelli\EntryVault\Models\EntryCategory::class)
-        ->and(EntryVault::getContentModel())->toBe(\Yannelli\EntryVault\Models\EntryContent::class);
+    expect(EntryVault::getEntryModel())->toBe(Entry::class)
+        ->and(EntryVault::getCategoryModel())->toBe(EntryCategory::class)
+        ->and(EntryVault::getContentModel())->toBe(EntryContent::class);
 });

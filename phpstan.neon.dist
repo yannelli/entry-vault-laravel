@@ -10,3 +10,11 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        -
+            identifier: trait.unused
+        -
+            identifier: argument.type
+            path: src/Filament/*
+            message: '#view-string#'

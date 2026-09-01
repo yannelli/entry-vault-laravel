@@ -16,11 +16,6 @@ class User extends Model
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class);
-    }
-
-    public function currentTeam(): ?Team
-    {
-        return $this->teams()->first();
+        return $this->belongsToMany(Team::class, 'team_user');
     }
 }

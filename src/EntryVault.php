@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Yannelli\EntryVault\Exceptions\EntryVaultException;
 use Yannelli\EntryVault\Models\Entry;
 use Yannelli\EntryVault\Models\EntryCategory;
+use Yannelli\EntryVault\Models\EntryContent;
 
 class EntryVault
 {
@@ -214,7 +215,7 @@ class EntryVault
      */
     public function create(array $attributes): Entry
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::create($attributes);
     }
@@ -224,7 +225,7 @@ class EntryVault
      */
     public function findBySlug(string $slug, ?Model $owner = null): ?Entry
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::findBySlug($slug, $owner);
     }
@@ -234,7 +235,7 @@ class EntryVault
      */
     public function findByUuid(string $uuid): ?Entry
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::findByUuid($uuid);
     }
@@ -258,7 +259,7 @@ class EntryVault
      */
     public function templates(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::templates();
     }
@@ -268,7 +269,7 @@ class EntryVault
      */
     public function systemTemplates(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::systemTemplates();
     }
@@ -278,7 +279,7 @@ class EntryVault
      */
     public function starters(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::starters();
     }
@@ -288,7 +289,7 @@ class EntryVault
      */
     public function startersInCategory(EntryCategory|int|string $category): Builder
     {
-        return $this->starters()->inCategory($category);
+        return $this->entryModelClass()::starters()->inCategory($category);
     }
 
     /**
@@ -296,7 +297,7 @@ class EntryVault
      */
     public function categories(): Builder
     {
-        $categoryModel = config('entry-vault.models.category');
+        $categoryModel = $this->categoryModelClass();
 
         return $categoryModel::system();
     }
@@ -306,7 +307,7 @@ class EntryVault
      */
     public function categoriesFor(Model $user): Builder
     {
-        $categoryModel = config('entry-vault.models.category');
+        $categoryModel = $this->categoryModelClass();
 
         return $categoryModel::accessibleBy($user)->ordered();
     }
@@ -316,7 +317,7 @@ class EntryVault
      */
     public function defaultCategory(): ?EntryCategory
     {
-        $categoryModel = config('entry-vault.models.category');
+        $categoryModel = $this->categoryModelClass();
 
         return $categoryModel::system()->default()->first();
     }
@@ -326,7 +327,7 @@ class EntryVault
      */
     public function findCategoryBySlug(string $slug, ?Model $owner = null): ?EntryCategory
     {
-        $categoryModel = config('entry-vault.models.category');
+        $categoryModel = $this->categoryModelClass();
 
         return $categoryModel::findBySlug($slug, $owner);
     }
@@ -336,7 +337,7 @@ class EntryVault
      */
     public function findCategoryByUuid(string $uuid): ?EntryCategory
     {
-        $categoryModel = config('entry-vault.models.category');
+        $categoryModel = $this->categoryModelClass();
 
         return $categoryModel::findByUuid($uuid);
     }
@@ -346,7 +347,7 @@ class EntryVault
      */
     public function accessibleBy(Model $user): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::accessibleBy($user);
     }
@@ -356,7 +357,7 @@ class EntryVault
      */
     public function publicEntries(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::public();
     }
@@ -366,7 +367,7 @@ class EntryVault
      */
     public function entriesFor(Model $owner): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::ownedBy($owner);
     }
@@ -376,7 +377,7 @@ class EntryVault
      */
     public function createFromTemplate(Entry $template, array $attributes = []): Entry
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::createFromTemplate($template, $attributes);
     }
@@ -386,7 +387,7 @@ class EntryVault
      */
     public function published(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::published();
     }
@@ -396,7 +397,7 @@ class EntryVault
      */
     public function drafts(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::draft();
     }
@@ -406,7 +407,7 @@ class EntryVault
      */
     public function archived(): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::archived();
     }
@@ -416,32 +417,74 @@ class EntryVault
      */
     public function inCategory(EntryCategory|int|string $category): Builder
     {
-        $entryModel = config('entry-vault.models.entry');
+        $entryModel = $this->entryModelClass();
 
         return $entryModel::inCategory($category);
     }
 
     /**
      * Get the Entry model class.
+     *
+     * @return class-string<Entry>
      */
     public function getEntryModel(): string
     {
-        return config('entry-vault.models.entry');
+        return $this->entryModelClass();
     }
 
     /**
      * Get the EntryCategory model class.
+     *
+     * @return class-string<EntryCategory>
      */
     public function getCategoryModel(): string
     {
-        return config('entry-vault.models.category');
+        return $this->categoryModelClass();
     }
 
     /**
      * Get the EntryContent model class.
+     *
+     * @return class-string<EntryContent>
      */
     public function getContentModel(): string
     {
-        return config('entry-vault.models.content');
+        return $this->contentModelClass();
+    }
+
+    /**
+     * @return class-string<Entry>
+     */
+    protected function entryModelClass(): string
+    {
+        $class = config('entry-vault.models.entry', Entry::class);
+
+        return is_string($class) && is_a($class, Entry::class, true)
+            ? $class
+            : Entry::class;
+    }
+
+    /**
+     * @return class-string<EntryCategory>
+     */
+    protected function categoryModelClass(): string
+    {
+        $class = config('entry-vault.models.category', EntryCategory::class);
+
+        return is_string($class) && is_a($class, EntryCategory::class, true)
+            ? $class
+            : EntryCategory::class;
+    }
+
+    /**
+     * @return class-string<EntryContent>
+     */
+    protected function contentModelClass(): string
+    {
+        $class = config('entry-vault.models.content', EntryContent::class);
+
+        return is_string($class) && is_a($class, EntryContent::class, true)
+            ? $class
+            : EntryContent::class;
     }
 }

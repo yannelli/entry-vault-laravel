@@ -1,5 +1,10 @@
 <?php
 
+use Yannelli\EntryVault\Models\Entry;
+use Yannelli\EntryVault\Models\EntryCategory;
+use Yannelli\EntryVault\Models\EntryContent;
+use Yannelli\EntryVault\Models\EntryVersion;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -25,10 +30,10 @@ return [
     |
     */
     'models' => [
-        'entry' => \Yannelli\EntryVault\Models\Entry::class,
-        'content' => \Yannelli\EntryVault\Models\EntryContent::class,
-        'category' => \Yannelli\EntryVault\Models\EntryCategory::class,
-        'version' => \Yannelli\EntryVault\Models\EntryVersion::class,
+        'entry' => Entry::class,
+        'content' => EntryContent::class,
+        'category' => EntryCategory::class,
+        'version' => EntryVersion::class,
     ],
 
     /*
@@ -39,7 +44,7 @@ return [
     | The user model class for relationships like creator and updater.
     |
     */
-    'user_model' => \App\Models\User::class,
+    'user_model' => 'App\\Models\\User',
 
     /*
     |--------------------------------------------------------------------------

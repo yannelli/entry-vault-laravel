@@ -1,7 +1,10 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Yannelli\EntryVault\Enums\EntryVisibility;
 use Yannelli\EntryVault\Models\Entry;
+use Yannelli\EntryVault\Support\CurrentTeam;
+use Yannelli\EntryVault\Tests\Models\JetstreamUser;
 use Yannelli\EntryVault\Tests\Models\Team;
 use Yannelli\EntryVault\Tests\Models\User;
 
@@ -137,4 +140,70 @@ test('visibility enum has labels', function () {
     expect(EntryVisibility::PUBLIC->label())->toBe('Public')
         ->and(EntryVisibility::PRIVATE->label())->toBe('Private')
         ->and(EntryVisibility::TEAM->label())->toBe('Team');
+});
+
+test('team entries are accessible via jetstream currentTeam relationship', function () {
+    $jetstreamUser = JetstreamUser::create([
+        'name' => 'Jetstream User',
+        'email' => 'jetstream@example.com',
+        'current_team_id' => $this->team->id,
+    ]);
+
+    $entry = Entry::create([
+        'title' => 'Jetstream Team Entry',
+        'visibility' => 'team',
+        'owner_type' => $this->otherUser->getMorphClass(),
+        'owner_id' => $this->otherUser->id,
+        'team_type' => $this->team->getMorphClass(),
+        'team_id' => $this->team->id,
+    ]);
+
+    expect($jetstreamUser->currentTeam())->toBeInstanceOf(BelongsTo::class)
+        ->and($entry->isAccessibleBy($jetstreamUser))->toBeTrue()
+        ->and(Entry::visibleTo($jetstreamUser)->whereKey($entry->id)->exists())->toBeTrue()
+        ->and(Entry::accessibleBy($jetstreamUser)->whereKey($entry->id)->exists())->toBeTrue();
+});
+
+test('current team helper resolves model-returning accessors', function () {
+    $team = $this->team;
+
+    $userWithAccessor = new class extends User
+    {
+        private ?Team $resolvedTeam = null;
+
+        public function setResolvedTeam(Team $team): static
+        {
+            $this->resolvedTeam = $team;
+
+            return $this;
+        }
+
+        public function currentTeam(): ?Team
+        {
+            return $this->resolvedTeam;
+        }
+    };
+    $userWithAccessor->setResolvedTeam($team);
+
+    $resolved = CurrentTeam::for($userWithAccessor);
+
+    expect($resolved)->toBeInstanceOf(Team::class)
+        ->and($resolved->id)->toBe($team->id);
+});
+
+test('current team helper resolves eloquent relationships', function () {
+    $jetstreamUser = JetstreamUser::create([
+        'name' => 'Relation User',
+        'email' => 'relation@example.com',
+        'current_team_id' => $this->team->id,
+    ]);
+
+    $resolved = CurrentTeam::for($jetstreamUser);
+
+    expect($resolved)->toBeInstanceOf(Team::class)
+        ->and($resolved->id)->toBe($this->team->id);
+});
+
+test('current team helper returns null when the method is missing', function () {
+    expect(CurrentTeam::for($this->user))->toBeNull();
 });

@@ -1,5 +1,6 @@
 <?php
 
+use Filament\Resources\RelationManagers\RelationManager;
 use Yannelli\EntryVault\Filament\Resources\EntryResource\RelationManagers\ContentsRelationManager;
 
 test('contents relation manager has correct relationship', function () {
@@ -28,7 +29,7 @@ test('contents relation manager has correct record title attribute', function ()
 
 test('contents relation manager class exists and extends relation manager', function () {
     expect(ContentsRelationManager::class)
-        ->toExtend(\Filament\Resources\RelationManagers\RelationManager::class);
+        ->toExtend(RelationManager::class);
 });
 
 test('contents relation manager has form method', function () {

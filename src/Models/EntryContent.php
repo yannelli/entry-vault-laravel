@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Yannelli\EntryVault\Enums\ContentType;
 
+/**
+ * @property int $id
+ * @property int $entry_id
+ * @property string|null $contentable_type
+ * @property int|null $contentable_id
+ * @property string $type
+ * @property string|null $body
+ * @property array<string, mixed>|null $metadata
+ * @property int $order
+ */
 class EntryContent extends Model
 {
     use HasFactory;

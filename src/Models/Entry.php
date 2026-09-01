@@ -3,11 +3,13 @@
 namespace Yannelli\EntryVault\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Overtrue\LaravelVersionable\Versionable;
 use Overtrue\LaravelVersionable\VersionStrategy;
@@ -22,6 +24,7 @@ use Yannelli\EntryVault\States\Archived;
 use Yannelli\EntryVault\States\Draft;
 use Yannelli\EntryVault\States\EntryState;
 use Yannelli\EntryVault\States\Published;
+use Yannelli\EntryVault\Support\CurrentTeam;
 use Yannelli\EntryVault\Traits\HasOwner;
 use Yannelli\EntryVault\Traits\HasTeam;
 use Yannelli\EntryVault\Traits\HasVisibility;
@@ -46,18 +49,18 @@ use Yannelli\EntryVault\Traits\HasVisibility;
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int $display_order
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, EntryContent> $contents
+ * @property Carbon|null $published_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection<int, EntryContent> $contents
  * @property-read EntryCategory|null $category
  * @property-read Model|null $owner
  * @property-read Model|null $team
  * @property-read Model|null $creator
  * @property-read Model|null $updater
  * @property-read Entry|null $template
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Entry> $derivedEntries
+ * @property-read Collection<int, Entry> $derivedEntries
  */
 class Entry extends Model
 {
@@ -214,17 +217,17 @@ class Entry extends Model
     // State scopes
     public function scopeDraft(Builder $query): Builder
     {
-        return $query->whereState('state', Draft::class);
+        return $query->where('state', Draft::$name);
     }
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->whereState('state', Published::class);
+        return $query->where('state', Published::$name);
     }
 
     public function scopeArchived(Builder $query): Builder
     {
-        return $query->whereState('state', Archived::class);
+        return $query->where('state', Archived::$name);
     }
 
     // Template scopes
@@ -252,7 +255,7 @@ class Entry extends Model
 
     public function scopeStarters(Builder $query): Builder
     {
-        return $query->systemTemplates()->featured();
+        return $this->scopeFeatured($this->scopeSystemTemplates($query));
     }
 
     // Category scopes
@@ -298,20 +301,21 @@ class Entry extends Model
             });
 
             // Team entries
-            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            $currentTeam = CurrentTeam::for($user);
             if ($currentTeam) {
                 $q->orWhere(function (Builder $q2) use ($currentTeam) {
                     $q2->where('visibility', EntryVisibility::TEAM->value)
                         ->where('team_type', $currentTeam->getMorphClass())
                         ->where('team_id', $currentTeam->getKey());
                 });
-            } elseif (method_exists($user, 'teams')) {
+            } else {
                 $q->orWhere(function (Builder $q2) use ($user) {
-                    $teamType = $user->teams->first()?->getMorphClass();
+                    $teams = CurrentTeam::memberships($user);
+                    $teamType = $teams->first()?->getMorphClass();
                     if ($teamType) {
                         $q2->where('visibility', EntryVisibility::TEAM->value)
                             ->where('team_type', $teamType)
-                            ->whereIn('team_id', $user->teams->pluck('id'));
+                            ->whereIn('team_id', $teams->pluck('id'));
                     }
                 });
             }
@@ -332,7 +336,7 @@ class Entry extends Model
             throw EntryVaultException::notATemplate($template->uuid);
         }
 
-        $entry = new static;
+        $entry = static::query()->newModelInstance();
 
         $entry->fill([
             'title' => $attributes['title'] ?? $template->title,
@@ -398,7 +402,9 @@ class Entry extends Model
 
     public static function findByUuid(string $uuid): ?static
     {
-        return static::where('uuid', $uuid)->first();
+        $entry = static::query()->where('uuid', $uuid)->first();
+
+        return $entry instanceof static ? $entry : null;
     }
 
     // State helpers
@@ -415,6 +421,34 @@ class Entry extends Model
     public function isArchived(): bool
     {
         return $this->state instanceof Archived || $this->state === 'archived';
+    }
+
+    public function publish(): static
+    {
+        $this->state->transitionTo(Published::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function unpublish(): static
+    {
+        $this->state->transitionTo(Draft::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function archive(): static
+    {
+        $this->state->transitionTo(Archived::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function restoreToDraft(): static
+    {
+        $this->state->transitionTo(Draft::class);
+
+        return $this->fresh() ?? $this;
     }
 
     // Template helpers
