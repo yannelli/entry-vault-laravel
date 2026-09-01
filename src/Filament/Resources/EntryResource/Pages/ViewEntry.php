@@ -35,21 +35,36 @@ class ViewEntry extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Draft)
-                ->action(fn (Entry $record): void => $record->publish()),
+                ->action(function (Entry $record): void {
+                    $record->publish();
+                }),
             Actions\Action::make('unpublish')
                 ->label('Unpublish')
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->color('warning')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Published)
-                ->action(fn (Entry $record): void => $record->unpublish()),
+                ->action(function (Entry $record): void {
+                    $record->unpublish();
+                }),
             Actions\Action::make('archive')
                 ->label('Archive')
                 ->icon('heroicon-o-archive-box')
                 ->color('danger')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => ! $record->state instanceof Archived)
-                ->action(fn (Entry $record): void => $record->archive()),
+                ->action(function (Entry $record): void {
+                    $record->archive();
+                }),
+            Actions\Action::make('restore_state')
+                ->label('Restore to Draft')
+                ->icon('heroicon-o-arrow-path')
+                ->color('gray')
+                ->requiresConfirmation()
+                ->visible(fn (Entry $record): bool => $record->state instanceof Archived)
+                ->action(function (Entry $record): void {
+                    $record->restoreToDraft();
+                }),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
             Actions\RestoreAction::make(),
