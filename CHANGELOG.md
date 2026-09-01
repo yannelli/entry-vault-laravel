@@ -15,12 +15,14 @@ All notable changes to `entry-vault` will be documented in this file.
 
 - Raised optional Filament admin integration to Filament 5 (from 4)
 - GitHub Actions: `ramsey/composer-install` v4, `dependabot/fetch-metadata` v3.1.0, `actions/checkout` v6
-- Composer constraints updated for Laravel 12|13 (`illuminate/*`, `orchestra/testbench` 10|11, `overtrue/laravel-versionable` 5.5|6, Pest 3|4)
+- Composer constraints updated for Laravel 12|13 (`illuminate/*`, `orchestra/testbench` 10|11, `overtrue/laravel-versionable` 5.5|6, Pest 3|4). Pest 5 is not included because it requires PHP 8.4 and `pestphp/pest-plugin-laravel` 5.0.1 supports Laravel 13 only.
 
 ### Fixed
 
 - PHPStan workflow now actually runs `phpstan analyse` after installing dependencies
 - Filament plugin `isEnabled()` fallback now matches the config default (`false`)
+- Filament state actions use statement closures so `publish()` / `archive()` return values do not violate `void` action types
+- Entry view page includes the Restore to Draft action for archived entries
 - Team visibility/authorization now supports Jetstream-style `currentTeam()` relationships (which return a Relation, not a model)
 - State machine now uses the package transition classes, so `transitionTo()` sets `published_at` and dispatches lifecycle events
 - Bug report template placeholders and GitHub issue contact links no longer use Spatie skeleton stubs

@@ -362,6 +362,12 @@ EntryVault::accessibleBy($user)->get();
 $entry->isAccessibleBy($user); // true/false
 ```
 
+Team-visible entries are accessible when the user belongs to the entry's team. The package resolves the current team from:
+
+- a `currentTeam()` accessor that returns a team model
+- a Laravel Jetstream-style `currentTeam()` `BelongsTo` relationship
+- a `teams()` membership collection when no current team is set
+
 ## Authorization Resolvers
 
 Entry Vault provides a flexible authorization system that allows you to define custom authorization logic in your service provider. This gives you full control over how ownership and team access are determined.
@@ -647,6 +653,8 @@ class Entry extends BaseEntry
 ```bash
 composer test
 ```
+
+CI covers PHP 8.2–8.5 with Laravel 12, and PHP 8.4–8.5 with Laravel 13. Laravel 13 jobs on PHP 8.2/8.3 are excluded because `spatie/laravel-model-states` 2.13+ (the first release that allows Laravel 13) requires PHP 8.4.
 
 ## Changelog
 
