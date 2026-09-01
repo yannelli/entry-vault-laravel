@@ -217,17 +217,17 @@ class Entry extends Model
     // State scopes
     public function scopeDraft(Builder $query): Builder
     {
-        return $query->whereState('state', Draft::class);
+        return $query->where('state', Draft::$name);
     }
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->whereState('state', Published::class);
+        return $query->where('state', Published::$name);
     }
 
     public function scopeArchived(Builder $query): Builder
     {
-        return $query->whereState('state', Archived::class);
+        return $query->where('state', Archived::$name);
     }
 
     // Template scopes
@@ -255,7 +255,7 @@ class Entry extends Model
 
     public function scopeStarters(Builder $query): Builder
     {
-        return $query->systemTemplates()->featured();
+        return $this->scopeFeatured($this->scopeSystemTemplates($query));
     }
 
     // Category scopes
@@ -308,13 +308,14 @@ class Entry extends Model
                         ->where('team_type', $currentTeam->getMorphClass())
                         ->where('team_id', $currentTeam->getKey());
                 });
-            } elseif (method_exists($user, 'teams')) {
+            } else {
                 $q->orWhere(function (Builder $q2) use ($user) {
-                    $teamType = $user->teams->first()?->getMorphClass();
+                    $teams = CurrentTeam::memberships($user);
+                    $teamType = $teams->first()?->getMorphClass();
                     if ($teamType) {
                         $q2->where('visibility', EntryVisibility::TEAM->value)
                             ->where('team_type', $teamType)
-                            ->whereIn('team_id', $user->teams->pluck('id'));
+                            ->whereIn('team_id', $teams->pluck('id'));
                     }
                 });
             }
@@ -335,7 +336,7 @@ class Entry extends Model
             throw EntryVaultException::notATemplate($template->uuid);
         }
 
-        $entry = new static;
+        $entry = static::query()->newModelInstance();
 
         $entry->fill([
             'title' => $attributes['title'] ?? $template->title,
@@ -401,7 +402,9 @@ class Entry extends Model
 
     public static function findByUuid(string $uuid): ?static
     {
-        return static::where('uuid', $uuid)->first();
+        $entry = static::query()->where('uuid', $uuid)->first();
+
+        return $entry instanceof static ? $entry : null;
     }
 
     // State helpers

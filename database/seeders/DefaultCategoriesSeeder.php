@@ -74,13 +74,13 @@ class DefaultCategoriesSeeder
                 ->whereNull('owner_id')
                 ->exists();
 
-            if ($exists && ! $force) {
-                $this->info("Category '{$categoryData['name']}' already exists, skipping...");
+            if ($exists) {
+                if (! $force) {
+                    $this->info("Category '{$categoryData['name']}' already exists, skipping...");
 
-                continue;
-            }
+                    continue;
+                }
 
-            if ($exists && $force) {
                 $categoryModel::where('slug', $categoryData['slug'])
                     ->whereNull('owner_type')
                     ->whereNull('owner_id')

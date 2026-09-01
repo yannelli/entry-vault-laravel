@@ -4,6 +4,7 @@ namespace Yannelli\EntryVault\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 
 final class CurrentTeam
 {
@@ -28,5 +29,25 @@ final class CurrentTeam
         }
 
         return $result instanceof Model ? $result : null;
+    }
+
+    /**
+     * Resolve the user's team memberships without assuming a `teams` attribute.
+     *
+     * @return Collection<int, Model>
+     */
+    public static function memberships(Model $user): Collection
+    {
+        if (! method_exists($user, 'teams')) {
+            return collect();
+        }
+
+        $teams = $user->getRelationValue('teams');
+
+        if ($teams instanceof Collection) {
+            return $teams;
+        }
+
+        return collect($teams ?? []);
     }
 }

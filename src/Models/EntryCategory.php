@@ -7,10 +7,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Yannelli\EntryVault\Support\CurrentTeam;
 use Yannelli\EntryVault\Traits\HasOwner;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $icon
+ * @property string|null $color
+ * @property bool $is_system
+ * @property bool $is_default
+ * @property string|null $owner_type
+ * @property int|null $owner_id
+ * @property int $display_order
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class EntryCategory extends Model
 {
     use HasFactory;
@@ -117,12 +135,13 @@ class EntryCategory extends Model
                     $q2->where('owner_type', $currentTeam->getMorphClass())
                         ->where('owner_id', $currentTeam->getKey());
                 });
-            } elseif (method_exists($user, 'teams')) {
+            } else {
                 $q->orWhere(function (Builder $q2) use ($user) {
-                    $teamType = $user->teams->first()?->getMorphClass();
+                    $teams = CurrentTeam::memberships($user);
+                    $teamType = $teams->first()?->getMorphClass();
                     if ($teamType) {
                         $q2->where('owner_type', $teamType)
-                            ->whereIn('owner_id', $user->teams->pluck('id'));
+                            ->whereIn('owner_id', $teams->pluck('id'));
                     }
                 });
             }
@@ -152,11 +171,15 @@ class EntryCategory extends Model
                 ->whereNull('owner_id');
         }
 
-        return $query->first();
+        $category = $query->first();
+
+        return $category instanceof static ? $category : null;
     }
 
     public static function findByUuid(string $uuid): ?static
     {
-        return static::where('uuid', $uuid)->first();
+        $category = static::query()->where('uuid', $uuid)->first();
+
+        return $category instanceof static ? $category : null;
     }
 }

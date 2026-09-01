@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Yannelli\EntryVault\Models\Entry;
 use Yannelli\EntryVault\Models\EntryCategory;
 use Yannelli\EntryVault\Models\EntryContent;
@@ -45,7 +44,7 @@ return [
     | The user model class for relationships like creator and updater.
     |
     */
-    'user_model' => User::class,
+    'user_model' => 'App\\Models\\User',
 
     /*
     |--------------------------------------------------------------------------

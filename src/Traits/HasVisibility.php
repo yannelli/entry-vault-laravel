@@ -46,12 +46,12 @@ trait HasVisibility
                     if ($currentTeam) {
                         $q2->where('team_type', $currentTeam->getMorphClass())
                             ->where('team_id', $currentTeam->getKey());
-                    } elseif (method_exists($user, 'teams')) {
-                        $teamIds = $user->teams->pluck('id');
-                        $teamType = $user->teams->first()?->getMorphClass();
+                    } else {
+                        $teams = CurrentTeam::memberships($user);
+                        $teamType = $teams->first()?->getMorphClass();
                         if ($teamType) {
                             $q2->where('team_type', $teamType)
-                                ->whereIn('team_id', $teamIds);
+                                ->whereIn('team_id', $teams->pluck('id'));
                         }
                     }
                 });
@@ -122,7 +122,7 @@ trait HasVisibility
                 return true;
             }
 
-            if (method_exists($user, 'teams') && $user->teams->contains('id', $this->team_id)) {
+            if (CurrentTeam::memberships($user)->contains('id', $this->team_id)) {
                 return true;
             }
         }
