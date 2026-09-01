@@ -2,9 +2,13 @@
 
 namespace Yannelli\EntryVault\Filament\Resources;
 
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -56,13 +60,13 @@ class EntryResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Entry Details')
+                Section::make('Entry Details')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $old, ?string $state) {
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
                                 if (($get('slug') ?? '') !== Str::slug($old)) {
                                     return;
                                 }
@@ -85,7 +89,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Classification')
+                Section::make('Classification')
                     ->schema([
                         Forms\Components\Select::make('category_id')
                             ->label('Category')
@@ -125,7 +129,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Template Settings')
+                Section::make('Template Settings')
                     ->schema([
                         Forms\Components\Toggle::make('is_template')
                             ->label('This is a template')
@@ -145,7 +149,7 @@ class EntryResource extends Resource
                     ->columns(3)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Ownership')
+                Section::make('Ownership')
                     ->schema([
                         Forms\Components\MorphToSelect::make('owner')
                             ->label('Owner')
@@ -259,10 +263,10 @@ class EntryResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->visible(fn () => config('entry-vault.soft_deletes', true)),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\Action::make('preview')
+            ->recordActions([
+                Actions\ActionGroup::make([
+                    Actions\ViewAction::make(),
+                    Actions\Action::make('preview')
                         ->label('Preview')
                         ->icon('heroicon-o-eye')
                         ->color('info')
@@ -273,8 +277,8 @@ class EntryResource extends Resource
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Close')
                         ->slideOver(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('publish')
+                    Actions\EditAction::make(),
+                    Actions\Action::make('publish')
                         ->label('Publish')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -283,7 +287,7 @@ class EntryResource extends Resource
                         ->action(function (Entry $record): void {
                             $record->publish();
                         }),
-                    Tables\Actions\Action::make('unpublish')
+                    Actions\Action::make('unpublish')
                         ->label('Unpublish')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('warning')
@@ -292,7 +296,7 @@ class EntryResource extends Resource
                         ->action(function (Entry $record): void {
                             $record->unpublish();
                         }),
-                    Tables\Actions\Action::make('archive')
+                    Actions\Action::make('archive')
                         ->label('Archive')
                         ->icon('heroicon-o-archive-box')
                         ->color('danger')
@@ -301,7 +305,7 @@ class EntryResource extends Resource
                         ->action(function (Entry $record): void {
                             $record->archive();
                         }),
-                    Tables\Actions\Action::make('restore_state')
+                    Actions\Action::make('restore_state')
                         ->label('Restore to Draft')
                         ->icon('heroicon-o-arrow-path')
                         ->color('gray')
@@ -310,16 +314,16 @@ class EntryResource extends Resource
                         ->action(function (Entry $record): void {
                             $record->restoreToDraft();
                         }),
-                    Tables\Actions\DeleteAction::make(),
-                    Tables\Actions\RestoreAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
+                    Actions\DeleteAction::make(),
+                    Actions\RestoreAction::make(),
+                    Actions\ForceDeleteAction::make(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('display_order', 'asc');
@@ -329,7 +333,7 @@ class EntryResource extends Resource
     {
         return $schema
             ->schema([
-                Infolists\Components\Section::make('Entry Details')
+                Section::make('Entry Details')
                     ->schema([
                         Infolists\Components\TextEntry::make('title'),
                         Infolists\Components\TextEntry::make('slug'),
@@ -343,7 +347,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Classification')
+                Section::make('Classification')
                     ->schema([
                         Infolists\Components\TextEntry::make('category.name')
                             ->label('Category')
@@ -371,7 +375,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(4),
 
-                Infolists\Components\Section::make('Template Information')
+                Section::make('Template Information')
                     ->schema([
                         Infolists\Components\IconEntry::make('is_template')
                             ->label('Is Template')
@@ -385,7 +389,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Timestamps')
+                Section::make('Timestamps')
                     ->schema([
                         Infolists\Components\TextEntry::make('created_at')
                             ->dateTime(),
@@ -401,7 +405,7 @@ class EntryResource extends Resource
                     ])
                     ->columns(4),
 
-                Infolists\Components\Section::make('Content Preview')
+                Section::make('Content Preview')
                     ->schema([
                         Infolists\Components\ViewEntry::make('contents')
                             ->view('entry-vault::filament.entry-preview')

@@ -2,9 +2,13 @@
 
 namespace Yannelli\EntryVault\Filament\Resources;
 
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -52,13 +56,13 @@ class EntryCategoryResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Category Details')
+                Section::make('Category Details')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $old, ?string $state) {
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
                                 if (($get('slug') ?? '') !== Str::slug($old)) {
                                     return;
                                 }
@@ -78,7 +82,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Appearance')
+                Section::make('Appearance')
                     ->schema([
                         Forms\Components\TextInput::make('icon')
                             ->maxLength(50)
@@ -94,7 +98,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(3),
 
-                Forms\Components\Section::make('Settings')
+                Section::make('Settings')
                     ->schema([
                         Forms\Components\Toggle::make('is_system')
                             ->label('System Category')
@@ -106,7 +110,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Ownership')
+                Section::make('Ownership')
                     ->description('Leave empty for system categories')
                     ->schema([
                         Forms\Components\MorphToSelect::make('owner')
@@ -177,18 +181,18 @@ class EntryCategoryResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->visible(fn () => config('entry-vault.soft_deletes', true)),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
+            ->recordActions([
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+                Actions\RestoreAction::make(),
+                Actions\ForceDeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\RestoreBulkAction::make(),
+                    Actions\ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->reorderable('display_order')
@@ -199,7 +203,7 @@ class EntryCategoryResource extends Resource
     {
         return $schema
             ->schema([
-                Infolists\Components\Section::make('Category Details')
+                Section::make('Category Details')
                     ->schema([
                         Infolists\Components\TextEntry::make('name'),
                         Infolists\Components\TextEntry::make('slug'),
@@ -211,7 +215,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Appearance')
+                Section::make('Appearance')
                     ->schema([
                         Infolists\Components\TextEntry::make('icon')
                             ->placeholder('No icon'),
@@ -222,7 +226,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Settings')
+                Section::make('Settings')
                     ->schema([
                         Infolists\Components\IconEntry::make('is_system')
                             ->label('System Category')
@@ -236,7 +240,7 @@ class EntryCategoryResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Timestamps')
+                Section::make('Timestamps')
                     ->schema([
                         Infolists\Components\TextEntry::make('created_at')
                             ->dateTime(),

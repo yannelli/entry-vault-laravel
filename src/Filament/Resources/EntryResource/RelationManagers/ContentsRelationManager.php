@@ -2,8 +2,11 @@
 
 namespace Yannelli\EntryVault\Filament\Resources\EntryResource\RelationManagers;
 
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,26 +31,26 @@ class ContentsRelationManager extends RelationManager
                     ]))
                     ->required()
                     ->live()
-                    ->afterStateUpdated(fn (Forms\Set $set) => $set('body', null)),
+                    ->afterStateUpdated(fn (Set $set) => $set('body', null)),
 
                 Forms\Components\MarkdownEditor::make('body')
                     ->label('Content')
                     ->required()
                     ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get): bool => $get('type') === 'markdown'),
+                    ->visible(fn (Get $get): bool => $get('type') === 'markdown'),
 
                 Forms\Components\RichEditor::make('body')
                     ->label('Content')
                     ->required()
                     ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get): bool => $get('type') === 'html'),
+                    ->visible(fn (Get $get): bool => $get('type') === 'html'),
 
                 Forms\Components\Textarea::make('body')
                     ->label('Content')
                     ->required()
                     ->rows(10)
                     ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get): bool => $get('type') === 'json')
+                    ->visible(fn (Get $get): bool => $get('type') === 'json')
                     ->helperText('Enter valid JSON content'),
 
                 Forms\Components\Textarea::make('body')
@@ -55,7 +58,7 @@ class ContentsRelationManager extends RelationManager
                     ->required()
                     ->rows(10)
                     ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get): bool => $get('type') === 'text'),
+                    ->visible(fn (Get $get): bool => $get('type') === 'text'),
 
                 Forms\Components\TextInput::make('order')
                     ->numeric()
@@ -109,10 +112,10 @@ class ContentsRelationManager extends RelationManager
                     ])),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\Action::make('preview')
+            ->recordActions([
+                Actions\Action::make('preview')
                     ->label('Preview')
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -122,12 +125,12 @@ class ContentsRelationManager extends RelationManager
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->reorderable('order')
