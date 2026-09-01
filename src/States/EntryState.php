@@ -4,6 +4,10 @@ namespace Yannelli\EntryVault\States;
 
 use Spatie\ModelStates\State;
 use Spatie\ModelStates\StateConfig;
+use Yannelli\EntryVault\Transitions\ArchiveTransition;
+use Yannelli\EntryVault\Transitions\PublishTransition;
+use Yannelli\EntryVault\Transitions\RestoreTransition;
+use Yannelli\EntryVault\Transitions\UnpublishTransition;
 
 abstract class EntryState extends State
 {
@@ -15,10 +19,10 @@ abstract class EntryState extends State
     {
         return parent::config()
             ->default(Draft::class)
-            ->allowTransition(Draft::class, Published::class)
-            ->allowTransition(Draft::class, Archived::class)
-            ->allowTransition(Published::class, Draft::class)
-            ->allowTransition(Published::class, Archived::class)
-            ->allowTransition(Archived::class, Draft::class);
+            ->allowTransition(Draft::class, Published::class, PublishTransition::class)
+            ->allowTransition(Draft::class, Archived::class, ArchiveTransition::class)
+            ->allowTransition(Published::class, Draft::class, UnpublishTransition::class)
+            ->allowTransition(Published::class, Archived::class, ArchiveTransition::class)
+            ->allowTransition(Archived::class, Draft::class, RestoreTransition::class);
     }
 }

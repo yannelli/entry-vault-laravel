@@ -22,6 +22,7 @@ use Yannelli\EntryVault\States\Archived;
 use Yannelli\EntryVault\States\Draft;
 use Yannelli\EntryVault\States\EntryState;
 use Yannelli\EntryVault\States\Published;
+use Yannelli\EntryVault\Support\CurrentTeam;
 use Yannelli\EntryVault\Traits\HasOwner;
 use Yannelli\EntryVault\Traits\HasTeam;
 use Yannelli\EntryVault\Traits\HasVisibility;
@@ -298,7 +299,7 @@ class Entry extends Model
             });
 
             // Team entries
-            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            $currentTeam = CurrentTeam::for($user);
             if ($currentTeam) {
                 $q->orWhere(function (Builder $q2) use ($currentTeam) {
                     $q2->where('visibility', EntryVisibility::TEAM->value)
@@ -415,6 +416,34 @@ class Entry extends Model
     public function isArchived(): bool
     {
         return $this->state instanceof Archived || $this->state === 'archived';
+    }
+
+    public function publish(): static
+    {
+        $this->state->transitionTo(Published::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function unpublish(): static
+    {
+        $this->state->transitionTo(Draft::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function archive(): static
+    {
+        $this->state->transitionTo(Archived::class);
+
+        return $this->fresh() ?? $this;
+    }
+
+    public function restoreToDraft(): static
+    {
+        $this->state->transitionTo(Draft::class);
+
+        return $this->fresh() ?? $this;
     }
 
     // Template helpers

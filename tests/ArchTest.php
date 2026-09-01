@@ -15,7 +15,8 @@ arch('events use Dispatchable trait')
 arch('states extend EntryState')
     ->expect('Yannelli\EntryVault\States')
     ->classes()
-    ->toExtend('Yannelli\EntryVault\States\EntryState');
+    ->toExtend('Yannelli\EntryVault\States\EntryState')
+    ->ignoring('Yannelli\EntryVault\States\EntryState');
 
 arch('transitions extend Transition')
     ->expect('Yannelli\EntryVault\Transitions')

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Yannelli\EntryVault\Enums\EntryVisibility;
 use Yannelli\EntryVault\Facades\EntryVault;
+use Yannelli\EntryVault\Support\CurrentTeam;
 
 trait HasVisibility
 {
@@ -41,7 +42,7 @@ trait HasVisibility
                 $q->orWhere(function (Builder $q2) use ($user) {
                     $q2->where('visibility', EntryVisibility::TEAM->value);
 
-                    $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+                    $currentTeam = CurrentTeam::for($user);
                     if ($currentTeam) {
                         $q2->where('team_type', $currentTeam->getMorphClass())
                             ->where('team_id', $currentTeam->getKey());
@@ -103,7 +104,7 @@ trait HasVisibility
         // Check team visibility
         if ($this->isTeamVisible() && $this->hasTeam()) {
             // Use team resolver if available
-            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            $currentTeam = CurrentTeam::for($user);
             if (EntryVault::hasTeamResolver()) {
                 if ($currentTeam) {
                     return EntryVault::checkTeamAuthorization($currentTeam, $this);
@@ -146,7 +147,7 @@ trait HasVisibility
         }
 
         // Check team authorization
-        $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+        $currentTeam = CurrentTeam::for($user);
         if (EntryVault::hasTeamResolver() && $currentTeam) {
             if (EntryVault::checkTeamAuthorization($currentTeam, $this)) {
                 return true;

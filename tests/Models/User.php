@@ -18,9 +18,4 @@ class User extends Model
     {
         return $this->belongsToMany(Team::class);
     }
-
-    public function currentTeam(): ?Team
-    {
-        return $this->teams()->first();
-    }
 }

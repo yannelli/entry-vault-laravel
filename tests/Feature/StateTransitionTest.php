@@ -2,6 +2,7 @@
 
 use Yannelli\EntryVault\Events\EntryArchived;
 use Yannelli\EntryVault\Events\EntryPublished;
+use Yannelli\EntryVault\Events\EntryRestored;
 use Yannelli\EntryVault\Events\EntryUnpublished;
 use Yannelli\EntryVault\Models\Entry;
 use Yannelli\EntryVault\States\Archived;
@@ -82,11 +83,15 @@ test('can transition from archived to draft (restore)', function () {
     $entry = Entry::create(['title' => 'Archived to Restore']);
     (new ArchiveTransition($entry))->handle();
 
+    Event::fake();
+
     $transition = new RestoreTransition($entry->fresh());
     $transition->handle();
 
     expect($entry->fresh()->state)->toBeInstanceOf(Draft::class)
         ->and($entry->fresh()->isDraft())->toBeTrue();
+
+    Event::assertDispatched(EntryRestored::class);
 });
 
 test('state scopes filter correctly', function () {
@@ -112,4 +117,44 @@ test('state has label and color', function () {
         ->and($published->color())->toBe('green')
         ->and($archived->label())->toBe('Archived')
         ->and($archived->color())->toBe('red');
+});
+
+test('transitionTo uses registered publish transition', function () {
+    $entry = Entry::create(['title' => 'State Machine Publish']);
+
+    Event::fake();
+
+    $entry->state->transitionTo(Published::class);
+
+    expect($entry->fresh()->state)->toBeInstanceOf(Published::class)
+        ->and($entry->fresh()->published_at)->not->toBeNull();
+
+    Event::assertDispatched(EntryPublished::class);
+});
+
+test('entry helpers publish unpublish archive and restore', function () {
+    $entry = Entry::create(['title' => 'Helper Transitions']);
+
+    Event::fake();
+
+    $published = $entry->publish();
+    expect($published->isPublished())->toBeTrue()
+        ->and($published->published_at)->not->toBeNull();
+    Event::assertDispatched(EntryPublished::class);
+
+    Event::fake();
+    $draft = $published->unpublish();
+    expect($draft->isDraft())->toBeTrue()
+        ->and($draft->published_at)->toBeNull();
+    Event::assertDispatched(EntryUnpublished::class);
+
+    Event::fake();
+    $archived = $draft->archive();
+    expect($archived->isArchived())->toBeTrue();
+    Event::assertDispatched(EntryArchived::class);
+
+    Event::fake();
+    $restored = $archived->restoreToDraft();
+    expect($restored->isDraft())->toBeTrue();
+    Event::assertDispatched(EntryRestored::class);
 });

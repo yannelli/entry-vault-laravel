@@ -44,7 +44,7 @@ class EntryVaultPlugin implements Plugin
      */
     public static function isEnabled(): bool
     {
-        return (bool) config('entry-vault.filament.enabled', true);
+        return (bool) config('entry-vault.filament.enabled', false);
     }
 
     public function register(Panel $panel): void

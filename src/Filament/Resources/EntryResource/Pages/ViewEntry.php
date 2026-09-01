@@ -35,31 +35,21 @@ class ViewEntry extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Draft)
-                ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Published::class);
-                    $record->published_at = now();
-                    $record->save();
-                }),
+                ->action(fn (Entry $record): void => $record->publish()),
             Actions\Action::make('unpublish')
                 ->label('Unpublish')
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->color('warning')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => $record->state instanceof Published)
-                ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Draft::class);
-                    $record->save();
-                }),
+                ->action(fn (Entry $record): void => $record->unpublish()),
             Actions\Action::make('archive')
                 ->label('Archive')
                 ->icon('heroicon-o-archive-box')
                 ->color('danger')
                 ->requiresConfirmation()
                 ->visible(fn (Entry $record): bool => ! $record->state instanceof Archived)
-                ->action(function (Entry $record): void {
-                    $record->state->transitionTo(Archived::class);
-                    $record->save();
-                }),
+                ->action(fn (Entry $record): void => $record->archive()),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
             Actions\RestoreAction::make(),

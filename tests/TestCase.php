@@ -53,6 +53,7 @@ class TestCase extends Orchestra
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->unsignedBigInteger('current_team_id')->nullable();
             $table->timestamps();
         });
 

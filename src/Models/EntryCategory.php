@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Yannelli\EntryVault\Support\CurrentTeam;
 use Yannelli\EntryVault\Traits\HasOwner;
 
 class EntryCategory extends Model
@@ -110,7 +111,7 @@ class EntryCategory extends Model
             });
 
             // User's team categories (if applicable)
-            $currentTeam = method_exists($user, 'currentTeam') ? $user->currentTeam() : null;
+            $currentTeam = CurrentTeam::for($user);
             if ($currentTeam) {
                 $q->orWhere(function (Builder $q2) use ($currentTeam) {
                     $q2->where('owner_type', $currentTeam->getMorphClass())
