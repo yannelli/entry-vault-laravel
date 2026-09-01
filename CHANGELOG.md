@@ -2,6 +2,15 @@
 
 All notable changes to `entry-vault` will be documented in this file.
 
+## v1.5.0 - 2026-09-01
+
+### What's Changed
+
+* Add Cursor Cloud Agent development environment by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/17
+* Stack open PRs and add Laravel 13 / PHP 8.5 support by @yannelli in https://github.com/yannelli/entry-vault-laravel/pull/18
+
+**Full Changelog**: https://github.com/yannelli/entry-vault-laravel/compare/v1.4.1...v1.5.0
+
 ## Unreleased
 
 ### Added
