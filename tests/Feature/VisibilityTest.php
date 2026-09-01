@@ -148,7 +148,6 @@ test('team entries are accessible via jetstream currentTeam relationship', funct
         'email' => 'jetstream@example.com',
         'current_team_id' => $this->team->id,
     ]);
-    $jetstreamUser->teams()->attach($this->team);
 
     $entry = Entry::create([
         'title' => 'Jetstream Team Entry',
@@ -166,23 +165,30 @@ test('team entries are accessible via jetstream currentTeam relationship', funct
 });
 
 test('current team helper resolves model-returning accessors', function () {
+    $team = $this->team;
+
     $userWithAccessor = new class extends User
     {
+        private ?Team $resolvedTeam = null;
+
+        public function setResolvedTeam(Team $team): static
+        {
+            $this->resolvedTeam = $team;
+
+            return $this;
+        }
+
         public function currentTeam(): ?Team
         {
-            return $this->teams()->first();
+            return $this->resolvedTeam;
         }
     };
-    $userWithAccessor->forceFill([
-        'name' => 'Accessor User',
-        'email' => 'accessor@example.com',
-    ])->save();
-    $userWithAccessor->teams()->attach($this->team);
+    $userWithAccessor->setResolvedTeam($team);
 
     $resolved = CurrentTeam::for($userWithAccessor);
 
     expect($resolved)->toBeInstanceOf(Team::class)
-        ->and($resolved->id)->toBe($this->team->id);
+        ->and($resolved->id)->toBe($team->id);
 });
 
 test('current team helper resolves eloquent relationships', function () {

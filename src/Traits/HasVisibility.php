@@ -112,16 +112,18 @@ trait HasVisibility
             }
 
             // Fall back to default team checks
-            if (method_exists($user, 'belongsToTeam')) {
-                return $user->belongsToTeam($this->team);
+            if ($currentTeam
+                && $currentTeam->getKey() === $this->team_id
+                && $currentTeam->getMorphClass() === $this->team_type) {
+                return true;
             }
 
-            if (method_exists($user, 'teams')) {
-                return $user->teams->contains('id', $this->team_id);
+            if (method_exists($user, 'belongsToTeam') && $user->belongsToTeam($this->team)) {
+                return true;
             }
 
-            if ($currentTeam) {
-                return $currentTeam->getKey() === $this->team_id;
+            if (method_exists($user, 'teams') && $user->teams->contains('id', $this->team_id)) {
+                return true;
             }
         }
 
