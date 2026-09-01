@@ -1,0 +1,5 @@
+{
+  "name": "Entry Vault (Laravel package)",
+  "user": "ubuntu",
+  "install": "bash .cursor/install.sh"
+}
