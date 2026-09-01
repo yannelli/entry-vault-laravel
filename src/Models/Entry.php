@@ -3,11 +3,13 @@
 namespace Yannelli\EntryVault\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Overtrue\LaravelVersionable\Versionable;
 use Overtrue\LaravelVersionable\VersionStrategy;
@@ -47,18 +49,18 @@ use Yannelli\EntryVault\Traits\HasVisibility;
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int $display_order
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, EntryContent> $contents
+ * @property Carbon|null $published_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection<int, EntryContent> $contents
  * @property-read EntryCategory|null $category
  * @property-read Model|null $owner
  * @property-read Model|null $team
  * @property-read Model|null $creator
  * @property-read Model|null $updater
  * @property-read Entry|null $template
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Entry> $derivedEntries
+ * @property-read Collection<int, Entry> $derivedEntries
  */
 class Entry extends Model
 {

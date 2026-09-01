@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 use Yannelli\EntryVault\Filament\EntryVaultPlugin;
 use Yannelli\EntryVault\Filament\Resources\EntryCategoryResource\Pages;
 use Yannelli\EntryVault\Models\EntryCategory;
@@ -58,11 +59,11 @@ class EntryCategoryResource extends Resource
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $old, ?string $state) {
-                                if (($get('slug') ?? '') !== \Illuminate\Support\Str::slug($old)) {
+                                if (($get('slug') ?? '') !== Str::slug($old)) {
                                     return;
                                 }
 
-                                $set('slug', \Illuminate\Support\Str::slug($state));
+                                $set('slug', Str::slug($state));
                             }),
 
                         Forms\Components\TextInput::make('slug')

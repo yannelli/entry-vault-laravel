@@ -8,8 +8,10 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 use Yannelli\EntryVault\Enums\EntryVisibility;
 use Yannelli\EntryVault\Filament\EntryVaultPlugin;
 use Yannelli\EntryVault\Filament\Resources\EntryResource\Pages;
@@ -61,11 +63,11 @@ class EntryResource extends Resource
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $old, ?string $state) {
-                                if (($get('slug') ?? '') !== \Illuminate\Support\Str::slug($old)) {
+                                if (($get('slug') ?? '') !== Str::slug($old)) {
                                     return;
                                 }
 
-                                $set('slug', \Illuminate\Support\Str::slug($state));
+                                $set('slug', Str::slug($state));
                             }),
 
                         Forms\Components\TextInput::make('slug')
@@ -265,7 +267,7 @@ class EntryResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('info')
                         ->modalHeading(fn (Entry $record): string => "Preview: {$record->title}")
-                        ->modalContent(fn (Entry $record): \Illuminate\Contracts\View\View => view('entry-vault::filament.entry-preview', [
+                        ->modalContent(fn (Entry $record): View => view('entry-vault::filament.entry-preview', [
                             'contents' => $record->contents,
                         ]))
                         ->modalSubmitAction(false)

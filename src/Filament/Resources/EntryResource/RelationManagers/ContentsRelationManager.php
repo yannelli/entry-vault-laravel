@@ -7,6 +7,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 use Yannelli\EntryVault\Enums\ContentType;
 
 class ContentsRelationManager extends RelationManager
@@ -116,7 +117,7 @@ class ContentsRelationManager extends RelationManager
                     ->icon('heroicon-o-eye')
                     ->color('info')
                     ->modalHeading('Content Preview')
-                    ->modalContent(fn ($record): \Illuminate\Contracts\View\View => view('entry-vault::filament.entry-preview', [
+                    ->modalContent(fn ($record): View => view('entry-vault::filament.entry-preview', [
                         'contents' => collect([$record]),
                     ]))
                     ->modalSubmitAction(false)

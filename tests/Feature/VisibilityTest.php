@@ -1,7 +1,10 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Yannelli\EntryVault\Enums\EntryVisibility;
 use Yannelli\EntryVault\Models\Entry;
+use Yannelli\EntryVault\Support\CurrentTeam;
+use Yannelli\EntryVault\Tests\Models\JetstreamUser;
 use Yannelli\EntryVault\Tests\Models\Team;
 use Yannelli\EntryVault\Tests\Models\User;
 
@@ -140,7 +143,7 @@ test('visibility enum has labels', function () {
 });
 
 test('team entries are accessible via jetstream currentTeam relationship', function () {
-    $jetstreamUser = \Yannelli\EntryVault\Tests\Models\JetstreamUser::create([
+    $jetstreamUser = JetstreamUser::create([
         'name' => 'Jetstream User',
         'email' => 'jetstream@example.com',
         'current_team_id' => $this->team->id,
@@ -156,7 +159,7 @@ test('team entries are accessible via jetstream currentTeam relationship', funct
         'team_id' => $this->team->id,
     ]);
 
-    expect($jetstreamUser->currentTeam())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class)
+    expect($jetstreamUser->currentTeam())->toBeInstanceOf(BelongsTo::class)
         ->and($entry->isAccessibleBy($jetstreamUser))->toBeTrue()
         ->and(Entry::visibleTo($jetstreamUser)->whereKey($entry->id)->exists())->toBeTrue()
         ->and(Entry::accessibleBy($jetstreamUser)->whereKey($entry->id)->exists())->toBeTrue();
@@ -176,25 +179,25 @@ test('current team helper resolves model-returning accessors', function () {
     ])->save();
     $userWithAccessor->teams()->attach($this->team);
 
-    $resolved = \Yannelli\EntryVault\Support\CurrentTeam::for($userWithAccessor);
+    $resolved = CurrentTeam::for($userWithAccessor);
 
     expect($resolved)->toBeInstanceOf(Team::class)
         ->and($resolved->id)->toBe($this->team->id);
 });
 
 test('current team helper resolves eloquent relationships', function () {
-    $jetstreamUser = \Yannelli\EntryVault\Tests\Models\JetstreamUser::create([
+    $jetstreamUser = JetstreamUser::create([
         'name' => 'Relation User',
         'email' => 'relation@example.com',
         'current_team_id' => $this->team->id,
     ]);
 
-    $resolved = \Yannelli\EntryVault\Support\CurrentTeam::for($jetstreamUser);
+    $resolved = CurrentTeam::for($jetstreamUser);
 
     expect($resolved)->toBeInstanceOf(Team::class)
         ->and($resolved->id)->toBe($this->team->id);
 });
 
 test('current team helper returns null when the method is missing', function () {
-    expect(\Yannelli\EntryVault\Support\CurrentTeam::for($this->user))->toBeNull();
+    expect(CurrentTeam::for($this->user))->toBeNull();
 });
