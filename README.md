@@ -1,6 +1,6 @@
 # Entry Vault
 
-A Laravel 12 package for building a backend-only entry/resource library system with multi-tenancy, versioning, and state management.
+A Laravel 12/13 package for building a backend-only entry/resource library system with multi-tenancy, versioning, and state management.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/yannelli/entry-vault-laravel.svg?style=flat-square)](https://packagist.org/packages/yannelli/entry-vault-laravel)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/yannelli/entry-vault-laravel/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/yannelli/entry-vault-laravel/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -15,9 +15,24 @@ A Laravel 12 package for building a backend-only entry/resource library system w
 - **Version History** - Built-in versioning with revert capabilities
 - **Category System** - System, team, or user-owned categories
 - **Template System** - Create entries from templates with featured/starter templates
-- **Filament 4 Integration** - Optional admin panel for managing entries, categories, and content
+- **Filament 5 Integration** - Optional admin panel for managing entries, categories, and content
 
 **No UI components are included by default.** This is a pure backend/API package with optional Filament admin panel integration.
+
+## Requirements
+
+- PHP 8.2, 8.3, 8.4, or 8.5
+- Laravel 12 or 13
+- [Filament 5](https://filamentphp.com) (optional, for the admin panel)
+
+| PHP | Laravel 12 | Laravel 13 |
+|-----|------------|------------|
+| 8.2 | Yes | No |
+| 8.3 | Yes | No |
+| 8.4 | Yes | Yes |
+| 8.5 | Yes | Yes |
+
+Laravel 13 requires PHP 8.3+, and this package needs PHP 8.4+ for Laravel 13 because `spatie/laravel-model-states` 2.13+ (the first release that allows Laravel 13) requires PHP 8.4.
 
 ## Installation
 
@@ -96,14 +111,14 @@ return [
 
 ## Filament Admin Panel (Optional)
 
-Entry Vault includes optional Filament 4 admin panel integration for managing entries, categories, and content.
+Entry Vault includes optional Filament 5 admin panel integration for managing entries, categories, and content.
 
 ### Installing Filament
 
-First, ensure you have Filament 4 installed in your Laravel application:
+First, ensure you have Filament 5 installed in your Laravel application:
 
 ```bash
-composer require filament/filament:"^4.0"
+composer require filament/filament:"^5.0"
 php artisan filament:install --panels
 ```
 
@@ -304,16 +319,17 @@ use Yannelli\EntryVault\Transitions\PublishTransition;
 use Yannelli\EntryVault\Transitions\UnpublishTransition;
 use Yannelli\EntryVault\Transitions\ArchiveTransition;
 
-// Publish an entry
+// Preferred: helpers that run the registered state transitions
+$entry->publish();
+$entry->unpublish();
+$entry->archive();
+$entry->restoreToDraft();
+
+// Equivalent: Spatie model-states API
+$entry->state->transitionTo(\Yannelli\EntryVault\States\Published::class);
+
+// Equivalent: construct a transition directly
 $transition = new PublishTransition($entry);
-$transition->handle();
-
-// Unpublish (back to draft)
-$transition = new UnpublishTransition($entry);
-$transition->handle();
-
-// Archive
-$transition = new ArchiveTransition($entry);
 $transition->handle();
 
 // Check state
@@ -465,30 +481,6 @@ EntryVault::checkCustomAuthorization('organization', $org, $entry);
 
 // Check all resolvers (on entry model)
 $entry->isAuthorizedFor($user);
-```
-
-### Visibility
-
-```php
-// Create with visibility
-$entry = Entry::create([
-    'title' => 'Team Entry',
-    'visibility' => 'team',
-    'team_type' => $team->getMorphClass(),
-    'team_id' => $team->id,
-]);
-
-// Query by visibility
-Entry::public()->get();
-Entry::private()->get();
-Entry::teamVisible()->get();
-
-// Get entries visible to a user
-Entry::visibleTo($user)->get();
-EntryVault::accessibleBy($user)->get();
-
-// Check access
-$entry->isAccessibleBy($user); // true/false
 ```
 
 ### Categories

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Entry Vault is a Laravel 12 backend-only package (`yannelli/entry-vault`) for building entry/resource library systems. It provides:
+Entry Vault is a Laravel 12/13 backend package (`yannelli/entry-vault-laravel`) for building entry/resource library systems. It provides:
 
 - Full CRUD operations on entries with metadata (title, description, keywords)
 - Multi-tenancy via polymorphic ownership (user, team, or custom model)
@@ -13,8 +13,14 @@ Entry Vault is a Laravel 12 backend-only package (`yannelli/entry-vault`) for bu
 - Built-in versioning with revert capabilities via overtrue/laravel-versionable
 - Category system (system, team, or user-owned)
 - Template system for starter/featured templates
+- Optional Filament 5 admin panel integration
 
-This is a reusable Composer package, not a full Laravel application. No UI components—purely API/backend focused.
+This is a reusable Composer package, not a full Laravel application. No UI components are included by default—purely API/backend focused, with optional Filament resources.
+
+## Requirements
+
+- PHP 8.2, 8.3, 8.4, or 8.5
+- Laravel 12 or 13 (Laravel 13 requires PHP 8.4+ in this package because `spatie/laravel-model-states` 2.13+ requires PHP 8.4)
 
 ## Common Commands
 
@@ -52,18 +58,20 @@ To run a specific test:
   ├── States/         Draft, Published, Archived (Spatie ModelStates)
   ├── Transitions/    State change handlers
   ├── Traits/         HasEntries, HasOwner, HasTeam, HasVisibility, HasEntryCategories, HasEntryContent
+  ├── Support/        CurrentTeam helper for Jetstream-style team resolution
   ├── Commands/       Artisan: InstallEntryVaultCommand, SeedCategoriesCommand
   ├── Events/         EntryCreated, EntryUpdated, EntryDeleted, EntryPublished, etc.
   ├── Exceptions/     EntryVaultException, InvalidStateTransition
   ├── Enums/          ContentType (markdown/html/json/text), EntryVisibility
   ├── Contracts/      EntryAdminResolver interface
   ├── Facades/        EntryVault facade
+  ├── Filament/       Optional Filament 5 plugin and resources
   └── EntryVault.php  Main service class with authorization resolver system
 ```
 
 ### Key Patterns
 
-**State Machine:** Uses Spatie's `spatie/laravel-model-states` for entry lifecycle (Draft/Published/Archived) with immutable state transitions and event dispatch.
+**State Machine:** Uses Spatie's `spatie/laravel-model-states` for entry lifecycle (Draft/Published/Archived) with immutable state transitions and event dispatch. `EntryState::config()` registers the package transition classes so `$entry->publish()` / `transitionTo()` fire the same events as constructing a transition directly.
 
 **Authorization System:** Flexible resolver system in `EntryVault.php`:
 - Global authorization callback
@@ -90,16 +98,17 @@ Main config file: `config/entry-vault.php`
 - Default visibility/state settings, versioning strategy
 - Content types allowed, admin resolver registration
 - Soft delete toggle, seeding options
+- Optional Filament integration (disabled by default)
 
 ## Testing
 
-- **Framework:** Pest PHP v3 with Laravel and Arch plugins
+- **Framework:** Pest PHP 3 or 4 with Laravel and Arch plugins
 - **Location:** `/tests` directory
-- **CI:** GitHub Actions tests against PHP 8.3/8.4 and Laravel 11.*/12.*
+- **CI:** GitHub Actions tests PHP 8.2/8.3/8.4/8.5 against Laravel 12.*, and PHP 8.4/8.5 against Laravel 13.*, on Ubuntu and Windows
 
 ## Code Quality Requirements
 
-- PHP 8.2+ required
+- PHP 8.2+ required (PHP 8.4+ for Laravel 13)
 - PHPStan level 5 (strict static analysis)
 - Laravel Pint formatting
 - Tests must pass on multiple PHP/Laravel version combinations
